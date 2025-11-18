@@ -3,217 +3,606 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica Isaac - Sistema Web</title>
+    <title>Clínica Isaac - Sistema Profesional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
         .header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: var(--white);
+            padding: 25px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             margin-bottom: 30px;
-            text-align: center;
-        }
-        .header h1 { color: #667eea; font-size: 2.5em; margin-bottom: 10px; }
-        .header p { color: #666; font-size: 1.1em; }
-        .stats {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-        .stat-card {
-            background: #f5f5f5;
-            padding: 15px 30px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .stat-number { font-size: 2em; font-weight: bold; color: #667eea; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab {
-            flex: 1;
-            padding: 15px;
-            background: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .tab:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .tab.active { background: #667eea; color: white; }
-        .content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .hidden { display: none; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border 0.3s;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-right: 10px;
-        }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-success { background: #43a047; color: white; }
-        .btn-danger { background: #e53935; color: white; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .chat-container {
-            height: 400px;
-            overflow-y: auto;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #f5f5f5;
-        }
-        .mensaje {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 10px;
-            max-width: 70%;
-            animation: slideIn 0.3s;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .mensaje-cliente {
-            background: #667eea;
-            color: white;
-            margin-left: auto;
-            text-align: right;
-        }
-        .mensaje-servidor {
-            background: white;
-            border: 2px solid #ddd;
-        }
-        .lista-pacientes { display: grid; gap: 15px; margin-top: 20px; }
-        .paciente-card {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 5px solid #667eea;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s;
         }
-        .paciente-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+
+        .header-left h1 {
+            color: var(--primary);
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
         }
-        .paciente-info { flex: 1; }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #667eea;
-            font-size: 1.2em;
+
+        .header-left p {
+            color: #64748b;
+            font-size: 1em;
         }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #43a047;
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--light);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 15px 25px;
+            font-weight: bold;
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-content h3 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-content p {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .stat-card.blue .stat-content h3 { color: var(--primary); }
+        .stat-card.blue .stat-icon { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+
+        .stat-card.purple .stat-content h3 { color: var(--secondary); }
+        .stat-card.purple .stat-icon { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+
+        .stat-card.green .stat-content h3 { color: var(--success); }
+        .stat-card.green .stat-icon { background: linear-gradient(135deg, #10b981, #34d399); }
+
+        .stat-card.orange .stat-content h3 { color: var(--warning); }
+        .stat-card.orange .stat-icon { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: var(--white);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        /* CONTENT */
+        .content {
+            background: var(--white);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            min-height: 500px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* DASHBOARD GRID */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 1.3em;
+        }
+
+        /* TABLES */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            background: var(--light);
+        }
+
+        table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        table tbody tr:hover {
+            background: var(--light);
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* FORMS */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--light);
             border-radius: 10px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 1000;
-            animation: slideInRight 0.3s;
         }
-        @keyframes slideInRight {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
         }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* CHAT */
+        .chat-container {
+            height: 450px;
+            overflow-y: auto;
+            border: 2px solid var(--light);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: var(--light);
+        }
+
+        .mensaje {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: slideIn 0.3s;
+            line-height: 1.6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mensaje-cliente {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 5px;
+        }
+
+        .mensaje-servidor {
+            background: var(--white);
+            border: 2px solid var(--light);
+            border-bottom-left-radius: 5px;
+        }
+
         .chat-input-container {
             display: flex;
             gap: 10px;
         }
+
         .chat-input-container input {
             flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 15px 20px;
+            border: 2px solid var(--light);
+            border-radius: 25px;
+            font-size: 1em;
+        }
+
+        .chat-suggestions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-btn {
+            padding: 8px 16px;
+            background: var(--white);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .suggestion-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* NOTIFICATION */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideInRight 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* LOADING */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary);
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- HEADER -->
         <div class="header">
-            <h1>🏥 Clínica Isaac</h1>
-            <p>Sistema de Gestión de Pacientes en la Web</p>
-            <div class="stats">
-                <div class="stat-card">
-                    <span>👥</span>
+            <div class="header-left">
+                <h1><i class="fas fa-hospital"></i> Clínica Isaac</h1>
+                <p>Sistema Integral de Gestión Médica</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">IN</div>
                     <div>
-                        <div class="stat-number" id="total-pacientes">0</div>
-                        <div>Pacientes</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <span>📅</span>
-                    <div>
-                        <div class="stat-number" id="total-citas">0</div>
-                        <div>Citas</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <span>🌐</span>
-                    <div>
-                        <div class="stat-number" id="usuarios-online">0</div>
-                        <div>En línea</div>
+                        <div style="font-weight: 600;">Isaac Núñez</div>
+                        <div style="font-size: 0.85em; color: #64748b;">Administrador</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('gestion')">👥 Gestión de Pacientes</button>
-            <button class="tab" onclick="showTab('chat')">💬 Chat Asistente</button>
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-content">
+                    <h3 id="total-pacientes">0</h3>
+                    <p>Pacientes Registrados</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+
+            <div class="stat-card purple">
+                <div class="stat-content">
+                    <h3 id="total-citas">0</h3>
+                    <p>Citas Programadas</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+            </div>
+
+            <div class="stat-card green">
+                <div class="stat-content">
+                    <h3 id="total-doctores">0</h3>
+                    <p>Doctores Disponibles</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+            </div>
+
+            <div class="stat-card orange">
+                <div class="stat-content">
+                    <h3 id="usuarios-online">0</h3>
+                    <p>Usuarios En Línea</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+            </div>
         </div>
 
-        <!-- TAB GESTIÓN -->
-        <div id="tab-gestion" class="content">
-            <h2>📝 Agregar Nuevo Paciente</h2>
-            <form id="form-paciente" onsubmit="agregarPaciente(event)" style="margin-bottom: 40px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </button>
+            <button class="tab" onclick="showTab('pacientes')">
+                <i class="fas fa-user-injured"></i> Pacientes
+            </button>
+            <button class="tab" onclick="showTab('citas')">
+                <i class="fas fa-calendar-alt"></i> Citas
+            </button>
+            <button class="tab" onclick="showTab('doctores')">
+                <i class="fas fa-stethoscope"></i> Doctores
+            </button>
+            <button class="tab" onclick="showTab('chat')">
+                <i class="fas fa-comments"></i> Asistente Virtual
+            </button>
+        </div>
+
+        <!-- TAB DASHBOARD -->
+        <div id="tab-dashboard" class="content">
+            <h2 style="margin-bottom: 25px; color: var(--dark);"><i class="fas fa-chart-pie"></i> Panel de Control</h2>
+            
+            <div class="dashboard-grid">
+                <div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-bar"></i> Estadísticas Generales</h3>
+                        <div id="stats-content" class="loading">
+                            <div class="spinner"></div>
+                            Cargando estadísticas...
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-map-marker-alt"></i> Pacientes por Ciudad</h3>
+                        <div id="ciudad-stats"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <div class="chart-card">
+                    <h3><i class="fas fa-trophy"></i> Top Doctores Más Activos</h3>
+                    <div id="top-doctores"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB PACIENTES -->
+        <div id="tab-pacientes" class="content hidden">
+            <h2 style="margin-bottom: 25px;"><i class="fas fa-user-plus"></i> Gestión de Pacientes</h2>
+            
+            <form id="form-paciente" onsubmit="agregarPaciente(event)" style="background: var(--light); padding: 25px; border-radius: 15px; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px;">Registrar Nuevo Paciente</h3>
+                <div class="form-grid">
                     <div class="form-group">
                         <label>Nombre Completo *</label>
                         <input type="text" id="nombre" placeholder="Ej: Juan Pérez García" required>
@@ -232,35 +621,124 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label>Doctor Asignado</label>
+                    <select id="doctor">
+                        <option value="Por asignar">Por asignar</option>
+                        <option value="Dr. Ramírez">Dr. Ramírez</option>
+                        <option value="Dra. López">Dra. López</option>
+                        <option value="Dr. Martínez">Dr. Martínez</option>
+                        <option value="Dra. Castro">Dra. Castro</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Motivo de Consulta *</label>
                     <input type="text" id="causa" placeholder="Ej: Dolor de cabeza persistente" required>
                 </div>
-                <button type="submit" class="btn btn-success">➕ Agregar Paciente</button>
-                <button type="button" class="btn btn-primary" onclick="cargarPacientes()">🔄 Actualizar Lista</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Agregar Paciente
+                </button>
+                <button type="button" class="btn btn-primary" onclick="cargarPacientes()">
+                    <i class="fas fa-sync"></i> Actualizar Lista
+                </button>
             </form>
 
-            <hr style="margin: 30px 0; border: none; border-top: 2px solid #eee;">
+            <h3 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Lista de Pacientes</h3>
+            <div class="table-container">
+                <div id="lista-pacientes">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Cargando pacientes...
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <h2>👥 Lista de Pacientes Registrados</h2>
-            <div id="lista-pacientes" class="lista-pacientes">
-                <div class="loading">⏳ Cargando pacientes...</div>
+        <!-- TAB CITAS -->
+        <div id="tab-citas" class="content hidden">
+            <h2 style="margin-bottom: 25px;"><i class="fas fa-calendar-plus"></i> Gestión de Citas</h2>
+            
+            <form id="form-cita" onsubmit="registrarCita(event)" style="background: var(--light); padding: 25px; border-radius: 15px; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px;">Programar Nueva Cita</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ID Paciente *</label>
+                        <input type="number" id="cita-paciente-id" placeholder="Ej: 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Doctor *</label>
+                        <select id="cita-doctor" required>
+                            <option value="">Seleccionar doctor</option>
+                            <option value="Dr. Ramírez">Dr. Ramírez</option>
+                            <option value="Dra. López">Dra. López</option>
+                            <option value="Dr. Martínez">Dr. Martínez</option>
+                            <option value="Dra. Castro">Dra. Castro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha *</label>
+                        <input type="date" id="cita-fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora *</label>
+                        <input type="time" id="cita-hora" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Motivo *</label>
+                    <input type="text" id="cita-motivo" placeholder="Ej: Consulta de seguimiento" required>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-calendar-check"></i> Programar Cita
+                </button>
+                <button type="button" class="btn btn-primary" onclick="cargarCitas()">
+                    <i class="fas fa-sync"></i> Actualizar Lista
+                </button>
+            </form>
+
+            <h3 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Citas Programadas</h3>
+            <div class="table-container">
+                <div id="lista-citas">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Cargando citas...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB DOCTORES -->
+        <div id="tab-doctores" class="content hidden">
+            <h2 style="margin-bottom: 25px;"><i class="fas fa-user-md"></i> Equipo Médico</h2>
+            <div class="table-container">
+                <div id="lista-doctores">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Cargando doctores...
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- TAB CHAT -->
         <div id="tab-chat" class="content hidden">
-            <h2>💬 Chat con Asistente Virtual</h2>
-            <p style="color: #666; margin-bottom: 20px;">Pregúntame sobre pacientes, citas o cualquier duda que tengas.</p>
+            <h2 style="margin-bottom: 20px;"><i class="fas fa-robot"></i> Asistente Virtual Inteligente</h2>
+            <p style="color: #64748b; margin-bottom: 20px;">Pregúntame sobre pacientes, citas, doctores o estadísticas. Estoy aquí para ayudarte 24/7.</p>
+            
+            <div class="chat-suggestions">
+                <button class="suggestion-btn" onclick="enviarSugerencia('ayuda')">📋 Ayuda</button>
+                <button class="suggestion-btn" onclick="enviarSugerencia('pacientes')">👥 Ver Pacientes</button>
+                <button class="suggestion-btn" onclick="enviarSugerencia('citas')">📅 Ver Citas</button>
+                <button class="suggestion-btn" onclick="enviarSugerencia('estadísticas')">📊 Estadísticas</button>
+                <button class="suggestion-btn" onclick="enviarSugerencia('doctores disponibles')">👨‍⚕️ Doctores</button>
+            </div>
             
             <div id="chat-messages" class="chat-container"></div>
             
             <div class="chat-input-container">
-                <input type="text" id="mensaje-input" placeholder="Escribe tu mensaje aquí... (Ej: Hola, ¿Cuántos pacientes hay?)" onkeypress="if(event.key==='Enter') enviarMensaje()">
-                <button class="btn btn-primary" onclick="enviarMensaje()">📤 Enviar</button>
-            </div>
-            
-            <div style="margin-top: 15px; color: #666; font-size: 14px;">
-                💡 Sugerencias: Escribe "hola", "listar pacientes", "ayuda", "gracias"
+                <input type="text" id="mensaje-input" placeholder="Escribe tu mensaje... Ej: ¿Cuántos pacientes hay?" onkeypress="if(event.key==='Enter') enviarMensaje()">
+                <button class="btn btn-primary" onclick="enviarMensaje()">
+                    <i class="fas fa-paper-plane"></i> Enviar
+                </button>
             </div>
         </div>
     </div>
@@ -292,6 +770,11 @@
             cargarEstadisticas();
         });
 
+        socket.on('cita_agregada', () => {
+            cargarCitas();
+            cargarEstadisticas();
+        });
+
         function showTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
@@ -299,7 +782,10 @@
             event.target.classList.add('active');
             document.getElementById('tab-' + tab).classList.remove('hidden');
             
-            if (tab === 'gestion') cargarPacientes();
+            if (tab === 'pacientes') cargarPacientes();
+            if (tab === 'citas') cargarCitas();
+            if (tab === 'doctores') cargarDoctores();
+            if (tab === 'dashboard') cargarDashboard();
         }
 
         async function agregarPaciente(e) {
@@ -310,6 +796,7 @@
                 edad: parseInt(document.getElementById('edad').value),
                 ciudad: document.getElementById('ciudad').value,
                 consultorio: document.getElementById('consultorio').value,
+                doctor: document.getElementById('doctor').value,
                 causa: document.getElementById('causa').value
             };
 
@@ -334,6 +821,38 @@
             }
         }
 
+        async function registrarCita(e) {
+            e.preventDefault();
+            
+            const data = {
+                id_paciente: document.getElementById('cita-paciente-id').value,
+                doctor: document.getElementById('cita-doctor').value,
+                fecha: document.getElementById('cita-fecha').value,
+                hora: document.getElementById('cita-hora').value,
+                motivo: document.getElementById('cita-motivo').value
+            };
+
+            try {
+                const response = await fetch('/api/citas', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    mostrarNotificacion('✅ Cita programada exitosamente');
+                    document.getElementById('form-cita').reset();
+                    cargarCitas();
+                } else {
+                    mostrarNotificacion('❌ Error: ' + result.error, 'error');
+                }
+            } catch (error) {
+                mostrarNotificacion('❌ Error de conexión', 'error');
+            }
+        }
+
         async function cargarPacientes() {
             try {
                 const response = await fetch('/api/pacientes');
@@ -347,20 +866,106 @@
                     return;
                 }
 
+                let table = '<table><thead><tr><th>ID</th><th>Nombre</th><th>Edad</th><th>Ciudad</th><th>Doctor</th><th>Consultorio</th><th>Causa</th><th>Estado</th>
+                    <th>Acciones</th></tr></thead><tbody>';
+
                 pacientes.forEach(p => {
-                    lista.innerHTML += `
-                        <div class="paciente-card">
-                            <div class="paciente-info">
-                                <strong style="font-size: 1.2em;">🆔 ${p.id} - ${p.nombre}</strong><br>
-                                <span style="color: #666;">
-                                    🎂 ${p.edad} años | 🌆 ${p.ciudad} | 🏥 ${p.consultorio}<br>
-                                    📋 ${p.causa} | 📅 ${p.fecha_ingreso}
-                                </span>
-                            </div>
-                            <button class="btn btn-danger" onclick="eliminarPaciente(${p.id}, '${p.nombre}')">🗑️ Eliminar</button>
-                        </div>
+                    const estadoBadge = p.estado === 'Activo' ? 'badge-success' : 'badge-warning';
+                    table += `
+                        <tr>
+                            <td><strong>#${p.id}</strong></td>
+                            <td><i class="fas fa-user"></i> ${p.nombre}</td>
+                            <td>${p.edad} años</td>
+                            <td><i class="fas fa-map-marker-alt"></i> ${p.ciudad}</td>
+                            <td><i class="fas fa-user-md"></i> ${p.doctor}</td>
+                            <td>${p.consultorio}</td>
+                            <td>${p.causa}</td>
+                            <td><span class="badge ${estadoBadge}">${p.estado}</span></td>
+                            <td>
+                                <button class="btn btn-danger" onclick="eliminarPaciente(${p.id}, '${p.nombre}')" style="padding: 8px 15px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
                     `;
                 });
+
+                table += '</tbody></table>';
+                lista.innerHTML = table;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function cargarCitas() {
+            try {
+                const response = await fetch('/api/citas');
+                const citas = await response.json();
+                
+                const lista = document.getElementById('lista-citas');
+                lista.innerHTML = '';
+
+                if (citas.length === 0) {
+                    lista.innerHTML = '<div class="loading">📭 No hay citas programadas</div>';
+                    return;
+                }
+
+                let table = '<table><thead><tr><th>ID</th><th>Paciente</th><th>Doctor</th><th>Fecha</th><th>Hora</th><th>Motivo</th><th>Estado</th></tr></thead><tbody>';
+
+                citas.forEach(c => {
+                    const estadoBadge = c.estado === 'Programada' ? 'badge-info' : 'badge-success';
+                    table += `
+                        <tr>
+                            <td><strong>#${c.id}</strong></td>
+                            <td><i class="fas fa-user-injured"></i> ${c.paciente}</td>
+                            <td><i class="fas fa-user-md"></i> ${c.doctor}</td>
+                            <td><i class="fas fa-calendar"></i> ${c.fecha}</td>
+                            <td><i class="fas fa-clock"></i> ${c.hora}</td>
+                            <td>${c.motivo}</td>
+                            <td><span class="badge ${estadoBadge}">${c.estado}</span></td>
+                        </tr>
+                    `;
+                });
+
+                table += '</tbody></table>';
+                lista.innerHTML = table;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function cargarDoctores() {
+            try {
+                const response = await fetch('/api/doctores');
+                const doctores = await response.json();
+                
+                const lista = document.getElementById('lista-doctores');
+                lista.innerHTML = '';
+
+                if (doctores.length === 0) {
+                    lista.innerHTML = '<div class="loading">📭 No hay doctores registrados</div>';
+                    return;
+                }
+
+                let table = '<table><thead><tr><th>ID</th><th>Nombre</th><th>Especialidad</th><th>Consultorio</th><th>Pacientes Atendidos</th><th>Estado</th></tr></thead><tbody>';
+
+                doctores.forEach(d => {
+                    const estadoBadge = d.disponible ? 'badge-success' : 'badge-danger';
+                    const estadoTexto = d.disponible ? 'Disponible' : 'Ocupado';
+                    table += `
+                        <tr>
+                            <td><strong>#${d.id}</strong></td>
+                            <td><i class="fas fa-user-md"></i> ${d.nombre}</td>
+                            <td><i class="fas fa-stethoscope"></i> ${d.especialidad}</td>
+                            <td>${d.consultorio}</td>
+                            <td><strong>${d.pacientes_atendidos}</strong> pacientes</td>
+                            <td><span class="badge ${estadoBadge}">${estadoTexto}</span></td>
+                        </tr>
+                    `;
+                });
+
+                table += '</tbody></table>';
+                lista.innerHTML = table;
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -390,7 +995,78 @@
                 const stats = await response.json();
                 
                 document.getElementById('total-pacientes').textContent = stats.total_pacientes;
-                document.getElementById('total-citas').textContent = stats.total_citas;
+                document.getElementById('total-citas').textContent = stats.citas_programadas;
+                document.getElementById('total-doctores').textContent = stats.total_doctores;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function cargarDashboard() {
+            try {
+                const response = await fetch('/api/estadisticas');
+                const stats = await response.json();
+                
+                // ESTADÍSTICAS GENERALES
+                const statsContent = document.getElementById('stats-content');
+                statsContent.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2.5em; color: var(--primary); font-weight: bold;">${stats.total_pacientes}</div>
+                            <div style="color: #64748b;">Total Pacientes</div>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2.5em; color: var(--success); font-weight: bold;">${stats.pacientes_activos}</div>
+                            <div style="color: #64748b;">Activos</div>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2.5em; color: var(--warning); font-weight: bold;">${stats.citas_programadas}</div>
+                            <div style="color: #64748b;">Citas Programadas</div>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2.5em; color: var(--secondary); font-weight: bold;">${stats.edad_promedio}</div>
+                            <div style="color: #64748b;">Edad Promedio</div>
+                        </div>
+                    </div>
+                `;
+
+                // PACIENTES POR CIUDAD
+                const ciudadStats = document.getElementById('ciudad-stats');
+                let ciudadHTML = '';
+                for (const [ciudad, cant] of Object.entries(stats.pacientes_por_ciudad)) {
+                    const porcentaje = (cant / stats.total_pacientes * 100).toFixed(1);
+                    ciudadHTML += `
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span><i class="fas fa-map-marker-alt"></i> ${ciudad}</span>
+                                <strong>${cant} pacientes (${porcentaje}%)</strong>
+                            </div>
+                            <div style="background: #e2e8f0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); width: ${porcentaje}%; height: 100%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+                ciudadStats.innerHTML = ciudadHTML;
+
+                // TOP DOCTORES
+                const topDoctores = document.getElementById('top-doctores');
+                let doctoresHTML = '<table style="width: 100%;"><thead><tr><th>Doctor</th><th>Especialidad</th><th>Pacientes Atendidos</th></tr></thead><tbody>';
+                
+                stats.top_doctores.forEach((d, index) => {
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                    doctoresHTML += `
+                        <tr>
+                            <td>${medal} ${d.nombre}</td>
+                            <td>${d.especialidad}</td>
+                            <td><strong style="color: var(--success);">${d.pacientes_atendidos}</strong></td>
+                        </tr>
+                    `;
+                });
+                
+                doctoresHTML += '</tbody></table>';
+                topDoctores.innerHTML = doctoresHTML;
+
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -407,13 +1083,24 @@
             input.value = '';
         }
 
+        function enviarSugerencia(mensaje) {
+            document.getElementById('mensaje-input').value = mensaje;
+            enviarMensaje();
+        }
+
         function agregarMensajeChat(tipo, texto) {
             const chat = document.getElementById('chat-messages');
             const div = document.createElement('div');
             div.className = 'mensaje mensaje-' + tipo;
             
             const time = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-            div.innerHTML = `<small style="opacity: 0.7;">[${time}]</small><br>${(tipo === 'cliente' ? '👤 Tú' : '🤖 Asistente')}: ${texto}`;
+            const icono = tipo === 'cliente' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            const nombre = tipo === 'cliente' ? 'Tú' : 'Asistente';
+            
+            div.innerHTML = `
+                <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 5px;">${icono} ${nombre} - ${time}</div>
+                <div style="white-space: pre-line;">${texto}</div>
+            `;
             
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
@@ -422,16 +1109,26 @@
         function mostrarNotificacion(mensaje, tipo = 'success') {
             const notif = document.createElement('div');
             notif.className = 'notification';
-            notif.style.background = tipo === 'error' ? '#e53935' : '#43a047';
-            notif.textContent = mensaje;
+            notif.style.background = tipo === 'error' ? 'var(--danger)' : 'var(--success)';
+            
+            const icono = tipo === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-check-circle"></i>';
+            notif.innerHTML = `${icono} ${mensaje}`;
+            
             document.body.appendChild(notif);
             
-            setTimeout(() => notif.remove(), 3000);
+            setTimeout(() => notif.remove(), 4000);
         }
 
-        // Cargar datos al inicio
+        // CARGAR DATOS AL INICIO
         cargarPacientes();
         cargarEstadisticas();
+        cargarDashboard();
+        cargarDoctores();
+        cargarCitas();
+
+        // Establecer fecha mínima para citas (hoy)
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('cita-fecha').setAttribute('min', hoy);
     </script>
 </body>
 </html>
