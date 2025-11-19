@@ -1,27 +1,14 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 import os
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
+app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'clinica-isaac-secret-2025')
-
-# CORS configurado correctamente
-CORS(app, resources={r"/*": {"origins": "*"}})
-
-# SocketIO configurado para Railway
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*",
-    async_mode='eventlet',
-    logger=False,
-    engineio_logger=False,
-    ping_timeout=60,
-    ping_interval=25,
-    transports=['websocket', 'polling']
-)
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # ========================================
 # BASE DE DATOS EN MEMORIA
@@ -71,7 +58,7 @@ usuarios_conectados = 0
 
 @app.route('/')
 def index():
-    return send_from_directory('templates', 'index.html')
+    return render_template('index.html')
 
 @app.route('/api/pacientes', methods=['GET'])
 def listar_pacientes():
@@ -95,9 +82,7 @@ def agregar_paciente():
         }
         pacientes_db.append(nuevo_paciente)
         next_id_paciente += 1
-        
         socketio.emit('actualizar_datos', {}, broadcast=True)
-        
         return jsonify({'mensaje': 'Paciente agregado', 'paciente': nuevo_paciente}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -138,7 +123,6 @@ def registrar_cita():
         }
         citas_db.append(nueva_cita)
         next_id_cita += 1
-        
         socketio.emit('actualizar_datos', {}, broadcast=True)
         return jsonify({'mensaje': 'Cita registrada', 'cita': nueva_cita}), 201
     except Exception as e:
@@ -206,14 +190,14 @@ Soy tu asistente virtual inteligente. Puedo ayudarte con:
 Escribe "ayuda" para ver todos los comandos disponibles o pregúntame lo que necesites en lenguaje natural."""
     
     emit('mensaje_servidor', {'texto': mensaje_bienvenida, 'tipo': 'bienvenida'})
-    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
+    emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
 
 @socketio.on('disconnect')
 def handle_disconnect():
     global usuarios_conectados
     usuarios_conectados = max(0, usuarios_conectados - 1)
     print(f'🔴 Cliente desconectado. Total: {usuarios_conectados}')
-    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
+    emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
 
 @socketio.on('mensaje_cliente')
 def handle_mensaje(data):
@@ -437,7 +421,7 @@ Estoy aquí para ayudarte 😊"""
 Error técnico: {str(e)}"""
         print(f"❌ Error en chatbot: {e}")
     
-    print(f"📤 Enviando respuesta al cliente")
+    print(f"📤 Enviando respuesta")
     emit('mensaje_servidor', {'texto': respuesta, 'tipo': 'respuesta'})
 
 # ========================================
@@ -455,4 +439,4 @@ if __name__ == '__main__':
     print(f'👨‍⚕ Doctores disponibles: {len(doctores_db)}')
     print(f'{"="*50}\n')
     
-    socketio.run(app, host='0.0.0.0', port=port, debug=False)
+    socketio.run(app, host='0.0.0.0', port=port, debug=True)
