@@ -82,10 +82,21 @@ def agregar_paciente():
         }
         pacientes_db.append(nuevo_paciente)
         next_id_paciente += 1
-        socketio.emit('actualizar_datos', {}, broadcast=True)
-        return jsonify({'mensaje': 'Paciente agregado', 'paciente': nuevo_paciente}), 201
+        
+        # Emitir actualización después de responder
+        socketio.start_background_task(socketio.emit, 'actualizar_datos', {}, broadcast=True)
+        
+        return jsonify({
+            'success': True,
+            'mensaje': 'Paciente agregado exitosamente',
+            'paciente': nuevo_paciente
+        }), 201
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error al agregar paciente: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/pacientes/<int:id>', methods=['DELETE'])
 def eliminar_paciente(id):
@@ -93,9 +104,15 @@ def eliminar_paciente(id):
     paciente = next((p for p in pacientes_db if p['id'] == id), None)
     if paciente:
         pacientes_db = [p for p in pacientes_db if p['id'] != id]
-        socketio.emit('actualizar_datos', {}, broadcast=True)
-        return jsonify({'mensaje': 'Paciente eliminado'})
-    return jsonify({'error': 'Paciente no encontrado'}), 404
+        socketio.start_background_task(socketio.emit, 'actualizar_datos', {}, broadcast=True)
+        return jsonify({
+            'success': True,
+            'mensaje': 'Paciente eliminado exitosamente'
+        })
+    return jsonify({
+        'success': False,
+        'error': 'Paciente no encontrado'
+    }), 404
 
 @app.route('/api/citas', methods=['GET'])
 def listar_citas():
@@ -109,7 +126,10 @@ def registrar_cita():
         paciente = next((p for p in pacientes_db if p['id'] == int(data['id_paciente'])), None)
         
         if not paciente:
-            return jsonify({'error': 'Paciente no encontrado'}), 404
+            return jsonify({
+                'success': False,
+                'error': 'Paciente no encontrado'
+            }), 404
         
         nueva_cita = {
             'id': next_id_cita,
@@ -123,10 +143,21 @@ def registrar_cita():
         }
         citas_db.append(nueva_cita)
         next_id_cita += 1
-        socketio.emit('actualizar_datos', {}, broadcast=True)
-        return jsonify({'mensaje': 'Cita registrada', 'cita': nueva_cita}), 201
+        
+        # Emitir actualización después de responder
+        socketio.start_background_task(socketio.emit, 'actualizar_datos', {}, broadcast=True)
+        
+        return jsonify({
+            'success': True,
+            'mensaje': 'Cita registrada exitosamente',
+            'cita': nueva_cita
+        }), 201
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error al registrar cita: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/doctores', methods=['GET'])
 def listar_doctores():
