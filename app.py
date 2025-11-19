@@ -7,45 +7,49 @@ import os
 import random
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'clinica-isaac-secret-2024'
+app.config['SECRET_KEY'] = 'clinica-isaac-secret-2025'
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # ========================================
-# BASE DE DATOS EN MEMORIA (MEJORADA)
+# BASE DE DATOS EN MEMORIA CON DATOS REALES 2025
 # ========================================
 
 pacientes_db = [
-    {'id': 1, 'nombre': 'Carlos Pérez', 'edad': 45, 'ciudad': 'Bogotá', 'consultorio': 'Consultorio 101', 'doctor': 'Dr. Ramírez', 'causa': 'Chequeo general', 'fecha_ingreso': '2024-01-15', 'estado': 'Activo'},
-    {'id': 2, 'nombre': 'Ana Gómez', 'edad': 29, 'ciudad': 'Medellín', 'consultorio': 'Consultorio 202', 'doctor': 'Dra. López', 'causa': 'Dolor de cabeza', 'fecha_ingreso': '2024-01-16', 'estado': 'Activo'},
-    {'id': 3, 'nombre': 'Luis Torres', 'edad': 38, 'ciudad': 'Cali', 'consultorio': 'Consultorio 303', 'doctor': 'Dr. Martínez', 'causa': 'Control de presión', 'fecha_ingreso': '2024-01-17', 'estado': 'Activo'},
-    {'id': 4, 'nombre': 'María Silva', 'edad': 52, 'ciudad': 'Bogotá', 'consultorio': 'Consultorio 101', 'doctor': 'Dr. Ramírez', 'causa': 'Diabetes', 'fecha_ingreso': '2024-01-18', 'estado': 'En consulta'},
-    {'id': 5, 'nombre': 'Pedro Ruiz', 'edad': 33, 'ciudad': 'Medellín', 'consultorio': 'Consultorio 404', 'doctor': 'Dra. Castro', 'causa': 'Gripe', 'fecha_ingreso': '2024-01-19', 'estado': 'Activo'},
-    {'id': 6, 'nombre': 'Laura Mendoza', 'edad': 41, 'ciudad': 'Cali', 'consultorio': 'Consultorio 303', 'doctor': 'Dr. Martínez', 'causa': 'Cardiología', 'fecha_ingreso': '2024-01-20', 'estado': 'Activo'},
-    {'id': 7, 'nombre': 'Jorge Vargas', 'edad': 27, 'ciudad': 'Barranquilla', 'consultorio': 'Consultorio 202', 'doctor': 'Dra. López', 'causa': 'Migraña', 'fecha_ingreso': '2024-01-21', 'estado': 'Activo'},
+    {'id': 1, 'nombre': 'Carlos Andrés Pérez Gómez', 'edad': 45, 'ciudad': 'Bogotá', 'consultorio': 'Consultorio 101', 'doctor': 'Dr. Juan Ramírez', 'causa': 'Hipertensión arterial', 'fecha_ingreso': '2025-01-15', 'estado': 'Activo'},
+    {'id': 2, 'nombre': 'Ana María Rodríguez López', 'edad': 32, 'ciudad': 'Medellín', 'consultorio': 'Consultorio 202', 'doctor': 'Dra. Laura López', 'causa': 'Migrañas crónicas', 'fecha_ingreso': '2025-02-20', 'estado': 'Activo'},
+    {'id': 3, 'nombre': 'Luis Fernando Torres Silva', 'edad': 58, 'ciudad': 'Cali', 'consultorio': 'Consultorio 303', 'doctor': 'Dr. Carlos Martínez', 'causa': 'Control cardiológico', 'fecha_ingreso': '2025-03-10', 'estado': 'Activo'},
+    {'id': 4, 'nombre': 'María Elena Suárez Castro', 'edad': 67, 'ciudad': 'Bogotá', 'consultorio': 'Consultorio 101', 'doctor': 'Dr. Juan Ramírez', 'causa': 'Diabetes tipo 2', 'fecha_ingreso': '2025-01-25', 'estado': 'En consulta'},
+    {'id': 5, 'nombre': 'Pedro José Ramírez Ortiz', 'edad': 28, 'ciudad': 'Barranquilla', 'consultorio': 'Consultorio 404', 'doctor': 'Dra. Ana Castro', 'causa': 'Faringitis aguda', 'fecha_ingreso': '2025-04-05', 'estado': 'Activo'},
+    {'id': 6, 'nombre': 'Laura Cristina Mendoza Vargas', 'edad': 41, 'ciudad': 'Cali', 'consultorio': 'Consultorio 303', 'doctor': 'Dr. Carlos Martínez', 'causa': 'Arritmia cardíaca', 'fecha_ingreso': '2025-02-14', 'estado': 'Activo'},
+    {'id': 7, 'nombre': 'Jorge Iván Vargas Ruiz', 'edad': 35, 'ciudad': 'Medellín', 'consultorio': 'Consultorio 202', 'doctor': 'Dra. Laura López', 'causa': 'Vértigo posicional', 'fecha_ingreso': '2025-03-22', 'estado': 'Activo'},
+    {'id': 8, 'nombre': 'Sandra Patricia Moreno Gil', 'edad': 52, 'ciudad': 'Bogotá', 'consultorio': 'Consultorio 101', 'doctor': 'Dr. Juan Ramírez', 'causa': 'Osteoporosis', 'fecha_ingreso': '2025-04-11', 'estado': 'Activo'},
+    {'id': 9, 'nombre': 'Roberto Carlos Díaz Sánchez', 'edad': 43, 'ciudad': 'Cartagena', 'consultorio': 'Consultorio 404', 'doctor': 'Dra. Ana Castro', 'causa': 'Gastritis crónica', 'fecha_ingreso': '2025-03-30', 'estado': 'Activo'},
+    {'id': 10, 'nombre': 'Diana Marcela Ríos Herrera', 'edad': 29, 'ciudad': 'Medellín', 'consultorio': 'Consultorio 202', 'doctor': 'Dra. Laura López', 'causa': 'Ansiedad generalizada', 'fecha_ingreso': '2025-04-18', 'estado': 'Activo'},
 ]
 
 citas_db = [
-    {'id': 1, 'id_paciente': 1, 'paciente': 'Carlos Pérez', 'doctor': 'Dr. Ramírez', 'fecha': '2024-01-20', 'hora': '09:00', 'motivo': 'Consulta de seguimiento', 'estado': 'Programada'},
-    {'id': 2, 'id_paciente': 2, 'paciente': 'Ana Gómez', 'doctor': 'Dra. López', 'fecha': '2024-01-20', 'hora': '10:30', 'motivo': 'Neurología', 'estado': 'Programada'},
-    {'id': 3, 'id_paciente': 3, 'paciente': 'Luis Torres', 'doctor': 'Dr. Martínez', 'fecha': '2024-01-21', 'hora': '14:00', 'motivo': 'Control mensual', 'estado': 'Programada'},
-    {'id': 4, 'id_paciente': 4, 'paciente': 'María Silva', 'doctor': 'Dr. Ramírez', 'fecha': '2024-01-19', 'hora': '11:00', 'motivo': 'Control de diabetes', 'estado': 'Completada'},
+    {'id': 1, 'id_paciente': 1, 'paciente': 'Carlos Andrés Pérez Gómez', 'doctor': 'Dr. Juan Ramírez', 'fecha': '2025-05-20', 'hora': '09:00', 'motivo': 'Control mensual de presión arterial', 'estado': 'Programada'},
+    {'id': 2, 'id_paciente': 2, 'paciente': 'Ana María Rodríguez López', 'doctor': 'Dra. Laura López', 'fecha': '2025-05-21', 'hora': '10:30', 'motivo': 'Valoración neurológica', 'estado': 'Programada'},
+    {'id': 3, 'id_paciente': 3, 'paciente': 'Luis Fernando Torres Silva', 'doctor': 'Dr. Carlos Martínez', 'fecha': '2025-05-22', 'hora': '14:00', 'motivo': 'Electrocardiograma de control', 'estado': 'Programada'},
+    {'id': 4, 'id_paciente': 4, 'paciente': 'María Elena Suárez Castro', 'doctor': 'Dr. Juan Ramírez', 'fecha': '2025-04-15', 'hora': '11:00', 'motivo': 'Resultados de glucosa en sangre', 'estado': 'Completada'},
+    {'id': 5, 'id_paciente': 5, 'paciente': 'Pedro José Ramírez Ortiz', 'doctor': 'Dra. Ana Castro', 'fecha': '2025-05-19', 'hora': '15:30', 'motivo': 'Seguimiento post-tratamiento', 'estado': 'Programada'},
+    {'id': 6, 'id_paciente': 6, 'paciente': 'Laura Cristina Mendoza Vargas', 'doctor': 'Dr. Carlos Martínez', 'fecha': '2025-05-23', 'hora': '09:30', 'motivo': 'Holter de 24 horas', 'estado': 'Programada'},
 ]
 
 doctores_db = [
-    {'id': 1, 'nombre': 'Dr. Juan Ramírez', 'especialidad': 'Medicina General', 'consultorio': 'Consultorio 101', 'pacientes_atendidos': 145, 'disponible': True},
-    {'id': 2, 'nombre': 'Dra. Laura López', 'especialidad': 'Neurología', 'consultorio': 'Consultorio 202', 'pacientes_atendidos': 132, 'disponible': True},
-    {'id': 3, 'nombre': 'Dr. Carlos Martínez', 'especialidad': 'Cardiología', 'consultorio': 'Consultorio 303', 'pacientes_atendidos': 98, 'disponible': False},
-    {'id': 4, 'nombre': 'Dra. Ana Castro', 'especialidad': 'Pediatría', 'consultorio': 'Consultorio 404', 'pacientes_atendidos': 87, 'disponible': True},
+    {'id': 1, 'nombre': 'Dr. Juan Ramírez', 'especialidad': 'Medicina General', 'consultorio': 'Consultorio 101', 'pacientes_atendidos': 245, 'disponible': True},
+    {'id': 2, 'nombre': 'Dra. Laura López', 'especialidad': 'Neurología', 'consultorio': 'Consultorio 202', 'pacientes_atendidos': 198, 'disponible': True},
+    {'id': 3, 'nombre': 'Dr. Carlos Martínez', 'especialidad': 'Cardiología', 'consultorio': 'Consultorio 303', 'pacientes_atendidos': 176, 'disponible': False},
+    {'id': 4, 'nombre': 'Dra. Ana Castro', 'especialidad': 'Medicina Interna', 'consultorio': 'Consultorio 404', 'pacientes_atendidos': 134, 'disponible': True},
 ]
 
-# Datos históricos para gráficas (últimos 12 meses)
 meses_labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-atendimientos_mensuales = [45, 52, 48, 61, 55, 67, 72, 68, 74, 81, 77, 85]
-consultas_mensuales = [120, 135, 128, 145, 152, 168, 175, 171, 182, 190, 185, 195]
+atendimientos_mensuales = [52, 58, 64, 71, 0, 0, 0, 0, 0, 0, 0, 0]  # 2025 hasta abril
+consultas_mensuales = [145, 162, 178, 195, 0, 0, 0, 0, 0, 0, 0, 0]
 
-next_id_paciente = 8
-next_id_cita = 5
+next_id_paciente = 11
+next_id_cita = 7
 usuarios_conectados = 0
 
 # ========================================
@@ -79,7 +83,7 @@ def agregar_paciente():
         pacientes_db.append(nuevo_paciente)
         next_id_paciente += 1
         socketio.emit('actualizar_datos', {}, broadcast=True)
-        return jsonify({'mensaje': 'Paciente agregado exitosamente', 'paciente': nuevo_paciente}), 201
+        return jsonify({'mensaje': 'Paciente agregado', 'paciente': nuevo_paciente}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -90,7 +94,7 @@ def eliminar_paciente(id):
     if paciente:
         pacientes_db = [p for p in pacientes_db if p['id'] != id]
         socketio.emit('actualizar_datos', {}, broadcast=True)
-        return jsonify({'mensaje': f'Paciente {id} eliminado'})
+        return jsonify({'mensaje': f'Paciente eliminado'})
     return jsonify({'error': 'Paciente no encontrado'}), 404
 
 @app.route('/api/citas', methods=['GET'])
@@ -132,35 +136,19 @@ def listar_doctores():
 def estadisticas():
     total_pacientes = len(pacientes_db)
     total_citas = len(citas_db)
-    total_doctores = len(doctores_db)
     
-    citas_programadas = len([c for c in citas_db if c['estado'] == 'Programada'])
-    citas_completadas = len([c for c in citas_db if c['estado'] == 'Completada'])
+    edad_promedio = sum(p['edad'] for p in pacientes_db) / len(pacientes_db) if pacientes_db else 0
     
-    pacientes_activos = len([p for p in pacientes_db if p['estado'] == 'Activo'])
-    pacientes_en_consulta = len([p for p in pacientes_db if p['estado'] == 'En consulta'])
-    
-    if pacientes_db:
-        edad_promedio = sum(p['edad'] for p in pacientes_db) / len(pacientes_db)
-    else:
-        edad_promedio = 0
-    
-    # Pacientes por ciudad
     ciudades = {}
     for p in pacientes_db:
         ciudades[p['ciudad']] = ciudades.get(p['ciudad'], 0) + 1
     
-    # Pacientes por doctor
     doctores_stats = {}
     for p in pacientes_db:
-        if p['doctor'] not in doctores_stats:
-            doctores_stats[p['doctor']] = 0
-        doctores_stats[p['doctor']] += 1
+        doctores_stats[p['doctor']] = doctores_stats.get(p['doctor'], 0) + 1
     
-    # Top doctores
-    top_doctores = sorted(doctores_db, key=lambda x: x['pacientes_atendidos'], reverse=True)[:3]
+    top_doctores = sorted(doctores_db, key=lambda x: x['pacientes_atendidos'], reverse=True)[:4]
     
-    # Pacientes por especialidad
     especialidades = {}
     for d in doctores_db:
         especialidades[d['especialidad']] = doctores_stats.get(d['nombre'], 0)
@@ -168,24 +156,18 @@ def estadisticas():
     return jsonify({
         'total_pacientes': total_pacientes,
         'total_citas': total_citas,
-        'total_doctores': total_doctores,
+        'total_doctores': len(doctores_db),
         'usuarios_conectados': usuarios_conectados,
-        'citas_programadas': citas_programadas,
-        'citas_completadas': citas_completadas,
-        'pacientes_activos': pacientes_activos,
-        'pacientes_en_consulta': pacientes_en_consulta,
         'edad_promedio': round(edad_promedio, 1),
         'pacientes_por_ciudad': ciudades,
-        'pacientes_por_doctor': doctores_stats,
         'top_doctores': top_doctores,
         'especialidades': especialidades,
         'meses': meses_labels,
         'atendimientos_mensuales': atendimientos_mensuales,
-        'consultas_mensuales': consultas_mensuales
     })
 
 # ========================================
-# WEBSOCKETS - CHATBOT MEJORADO
+# WEBSOCKETS - CHATBOT FUNCIONAL
 # ========================================
 
 @socketio.on('connect')
@@ -194,7 +176,7 @@ def handle_connect():
     usuarios_conectados += 1
     print(f'✅ Cliente conectado. Total: {usuarios_conectados}')
     emit('mensaje_servidor', {
-        'texto': '¡Bienvenido a Clínica Isaac! 👋 Soy tu asistente virtual.\n\nPuedo ayudarte con:\n• Ver pacientes y citas\n• Buscar información\n• Estadísticas en tiempo real\n• Y mucho más!\n\nEscribe "ayuda" para ver todos los comandos disponibles.',
+        'texto': '¡Bienvenido a Clínica Isaac! 👋\n\nSoy tu asistente virtual. Puedo ayudarte con:\n• Ver pacientes y citas\n• Buscar información\n• Estadísticas\n\nEscribe "ayuda" para ver todos los comandos.',
         'tipo': 'bienvenida'
     })
     socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
@@ -212,209 +194,87 @@ def handle_mensaje(data):
     respuesta = ""
     
     try:
-        # SALUDOS
-        if any(saludo in mensaje_lower for saludo in ['hola', 'buenos dias', 'buenas tardes', 'buenas noches', 'hi', 'hello', 'hey']):
-            respuesta = '¡Hola! 👋 Soy el asistente virtual de Clínica Isaac.\n\n¿En qué puedo ayudarte hoy?\n\n💡 Escribe "ayuda" para ver todo lo que puedo hacer por ti.'
+        if any(x in mensaje_lower for x in ['hola', 'hi', 'hello', 'buenos dias']):
+            respuesta = '¡Hola! 👋 Soy el asistente de Clínica Isaac.\n\n¿En qué puedo ayudarte?\n\n💡 Escribe "ayuda" para ver los comandos.'
         
-        # AYUDA
-        elif 'ayuda' in mensaje_lower or mensaje_lower in ['?', 'help', 'comandos']:
+        elif 'ayuda' in mensaje_lower:
             respuesta = """📋 COMANDOS DISPONIBLES:
 
 🔍 BÚSQUEDA:
-• "buscar [nombre]" - Busca pacientes por nombre
-• "doctor [nombre]" - Busca información de doctores
-• "ver paciente [id]" - Ver detalles de un paciente específico
-• "citas de [nombre]" - Ver citas de un paciente
+- "buscar [nombre]" - Busca pacientes
+- "ver paciente [id]" - Ver detalles
 
 📊 LISTADOS:
-• "pacientes" o "listar pacientes" - Lista todos los pacientes
-• "citas" o "listar citas" - Lista todas las citas
-• "doctores" o "listar doctores" - Lista el equipo médico
-• "pacientes de [ciudad]" - Filtra por ciudad
+- "pacientes" - Lista pacientes
+- "citas" - Lista citas
+- "doctores" - Lista doctores
 
 📈 ESTADÍSTICAS:
-• "estadísticas" - Resumen general del sistema
-• "edad promedio" - Edad promedio de pacientes
-• "ciudad más común" - Ciudad con más pacientes
-• "doctor más ocupado" - Doctor con más pacientes
+- "estadísticas" - Resumen general
+- "edad promedio" - Edad promedio
+- "ciudad más común" - Ciudad con más pacientes
 
-💬 También entiendo lenguaje natural, ¡prueba preguntarme cualquier cosa!"""
+💬 ¡También entiendo lenguaje natural!"""
         
-        # BUSCAR PACIENTE
-        elif 'buscar' in mensaje_lower and 'paciente' in mensaje_lower or mensaje_lower.startswith('buscar '):
-            nombre_buscar = mensaje_lower.replace('buscar', '').replace('paciente', '').strip()
-            if nombre_buscar:
-                pacientes = [p for p in pacientes_db if nombre_buscar in p['nombre'].lower()]
-                if pacientes:
-                    respuesta = f"🔍 Encontré {len(pacientes)} paciente(s) con '{nombre_buscar}':\n\n"
-                    for p in pacientes:
-                        respuesta += f"🆔 ID: {p['id']}\n👤 Nombre: {p['nombre']} ({p['edad']} años)\n📍 Ciudad: {p['ciudad']}\n👨‍⚕️ Doctor: {p['doctor']}\n🏥 Estado: {p['estado']}\n📋 Causa: {p['causa']}\n\n"
-                else:
-                    respuesta = f"❌ No encontré pacientes con el nombre '{nombre_buscar}'.\n\n💡 Intenta con otro nombre o escribe 'pacientes' para ver la lista completa."
-            else:
-                respuesta = "❌ Por favor especifica un nombre.\n\nEjemplo: buscar Carlos"
+        elif 'pacientes' in mensaje_lower:
+            respuesta = f"👥 Pacientes registrados: {len(pacientes_db)}\n\n"
+            for p in pacientes_db[:5]:
+                estado_emoji = "🟢" if p['estado'] == 'Activo' else "🔵"
+                respuesta += f"{estado_emoji} #{p['id']} - {p['nombre']} ({p['edad']} años)\n   📍 {p['ciudad']} | 👨‍⚕️ {p['doctor']}\n\n"
+            if len(pacientes_db) > 5:
+                respuesta += f"... y {len(pacientes_db) - 5} más"
         
-        # VER PACIENTE POR ID
-        elif 'ver paciente' in mensaje_lower or 'paciente' in mensaje_lower and any(c.isdigit() for c in mensaje):
-            import re
-            numeros = re.findall(r'\d+', mensaje)
-            if numeros:
-                id_buscar = int(numeros[0])
-                paciente = next((p for p in pacientes_db if p['id'] == id_buscar), None)
-                if paciente:
-                    respuesta = f"""📋 INFORMACIÓN DEL PACIENTE:
-
-🆔 ID: {paciente['id']}
-👤 Nombre: {paciente['nombre']}
-🎂 Edad: {paciente['edad']} años
-📍 Ciudad: {paciente['ciudad']}
-🏥 Consultorio: {paciente['consultorio']}
-👨‍⚕️ Doctor asignado: {paciente['doctor']}
-📋 Motivo: {paciente['causa']}
-📅 Fecha de ingreso: {paciente['fecha_ingreso']}
-🏥 Estado: {paciente['estado']}"""
-                else:
-                    respuesta = f"❌ No encontré un paciente con el ID {id_buscar}.\n\n💡 Escribe 'pacientes' para ver todos los IDs disponibles."
+        elif 'citas' in mensaje_lower:
+            respuesta = f"📅 Citas programadas: {len(citas_db)}\n\n"
+            for c in citas_db[:5]:
+                estado_emoji = "🟢" if c['estado'] == 'Programada' else "✅"
+                respuesta += f"{estado_emoji} Cita #{c['id']}\n👤 {c['paciente']}\n📅 {c['fecha']} - {c['hora']}\n👨‍⚕️ {c['doctor']}\n\n"
         
-        # LISTAR PACIENTES
-        elif 'pacientes' in mensaje_lower or 'listar paciente' in mensaje_lower:
-            # Filtrar por ciudad si se menciona
-            if 'de ' in mensaje_lower:
-                ciudad = mensaje_lower.split('de ')[-1].strip().title()
-                pacientes = [p for p in pacientes_db if ciudad.lower() in p['ciudad'].lower()]
-                if pacientes:
-                    respuesta = f"👥 Pacientes de {ciudad} ({len(pacientes)}):\n\n"
-                else:
-                    respuesta = f"❌ No hay pacientes registrados de {ciudad}"
-            else:
-                pacientes = pacientes_db
-                respuesta = f"👥 Total de pacientes registrados: {len(pacientes_db)}\n\n"
-            
-            if pacientes:
-                for p in pacientes:
-                    estado_emoji = "🟢" if p['estado'] == 'Activo' else "🔵"
-                    respuesta += f"{estado_emoji} #{p['id']} - {p['nombre']} ({p['edad']} años) - {p['ciudad']}\n   👨‍⚕️ {p['doctor']} | 📋 {p['causa']}\n\n"
-        
-        # LISTAR CITAS
-        elif 'citas' in mensaje_lower or 'listar citas' in mensaje_lower or 'ver citas' in mensaje_lower:
-            if 'de ' in mensaje_lower:
-                # Buscar citas de un paciente específico
-                nombre = mensaje_lower.split('de ')[-1].strip()
-                citas = [c for c in citas_db if nombre in c['paciente'].lower()]
-                if citas:
-                    respuesta = f"📅 Citas de {citas[0]['paciente']}:\n\n"
-                else:
-                    respuesta = f"❌ No encontré citas para '{nombre}'"
-            else:
-                citas = citas_db
-                respuesta = f"📅 Total de citas: {len(citas_db)}\n\n"
-            
-            if citas:
-                for c in citas:
-                    estado_emoji = "🟢" if c['estado'] == 'Programada' else "✅"
-                    respuesta += f"{estado_emoji} Cita #{c['id']}\n👤 Paciente: {c['paciente']}\n📅 Fecha: {c['fecha']} a las {c['hora']}\n👨‍⚕️ Doctor: {c['doctor']}\n📋 Motivo: {c['motivo']}\n🏥 Estado: {c['estado']}\n\n"
-        
-        # LISTAR DOCTORES
-        elif 'doctores' in mensaje_lower or 'medicos' in mensaje_lower or 'médicos' in mensaje_lower or 'doctor' in mensaje_lower:
-            respuesta = f"👨‍⚕️ Equipo médico de Clínica Isaac ({len(doctores_db)} doctores):\n\n"
+        elif 'doctores' in mensaje_lower:
+            respuesta = f"👨‍⚕️ Equipo médico ({len(doctores_db)}):\n\n"
             for d in doctores_db:
-                disponible = "🟢 Disponible" if d['disponible'] else "🔴 Ocupado"
-                respuesta += f"👨‍⚕️ {d['nombre']}\n🏥 Especialidad: {d['especialidad']}\n📍 {d['consultorio']}\n📊 Pacientes atendidos: {d['pacientes_atendidos']}\n{disponible}\n\n"
+                disp = "🟢 Disponible" if d['disponible'] else "🔴 Ocupado"
+                respuesta += f"👨‍⚕️ {d['nombre']}\n🏥 {d['especialidad']}\n📊 {d['pacientes_atendidos']} pacientes\n{disp}\n\n"
         
-        # ESTADÍSTICAS
-        elif 'estadísticas' in mensaje_lower or 'estadisticas' in mensaje_lower or 'estadística' in mensaje_lower:
-            total_pacientes = len(pacientes_db)
-            total_citas = len(citas_db)
-            edad_prom = sum(p['edad'] for p in pacientes_db) / len(pacientes_db) if pacientes_db else 0
-            
-            # Ciudad más común
-            ciudades = {}
-            for p in pacientes_db:
-                ciudades[p['ciudad']] = ciudades.get(p['ciudad'], 0) + 1
-            ciudad_comun = max(ciudades.items(), key=lambda x: x[1]) if ciudades else ('N/A', 0)
-            
-            # Doctor más ocupado
-            doctores_count = {}
-            for p in pacientes_db:
-                doctores_count[p['doctor']] = doctores_count.get(p['doctor'], 0) + 1
-            doctor_ocupado = max(doctores_count.items(), key=lambda x: x[1]) if doctores_count else ('N/A', 0)
-            
-            respuesta = f"""📊 ESTADÍSTICAS DE CLÍNICA ISAAC:
+        elif 'estadísticas' in mensaje_lower or 'estadisticas' in mensaje_lower:
+            edad_prom = sum(p['edad'] for p in pacientes_db) / len(pacientes_db)
+            respuesta = f"""📊 ESTADÍSTICAS:
 
-👥 Total de pacientes: {total_pacientes}
-📅 Citas programadas: {total_citas}
-👨‍⚕️ Doctores activos: {len(doctores_db)}
+👥 Pacientes: {len(pacientes_db)}
+📅 Citas: {len(citas_db)}
+👨‍⚕️ Doctores: {len(doctores_db)}
 🎂 Edad promedio: {round(edad_prom, 1)} años
-🌐 Usuarios en línea: {usuarios_conectados}
+🌐 Usuarios online: {usuarios_conectados}
 
-📍 Ciudad con más pacientes: {ciudad_comun[0]} ({ciudad_comun[1]} pacientes)
-⭐ Doctor más solicitado: {doctor_ocupado[0]} ({doctor_ocupado[1]} pacientes)
-
-✅ Pacientes activos: {len([p for p in pacientes_db if p['estado'] == 'Activo'])}
+✅ Activos: {len([p for p in pacientes_db if p['estado'] == 'Activo'])}
 🔵 En consulta: {len([p for p in pacientes_db if p['estado'] == 'En consulta'])}"""
         
-        # EDAD PROMEDIO
-        elif 'edad promedio' in mensaje_lower or 'edad media' in mensaje_lower:
-            edad_prom = sum(p['edad'] for p in pacientes_db) / len(pacientes_db) if pacientes_db else 0
-            respuesta = f"🎂 La edad promedio de los pacientes es: {round(edad_prom, 1)} años\n\nBasado en {len(pacientes_db)} pacientes registrados."
+        elif 'edad promedio' in mensaje_lower:
+            edad_prom = sum(p['edad'] for p in pacientes_db) / len(pacientes_db)
+            respuesta = f"🎂 Edad promedio: {round(edad_prom, 1)} años\n\nBasado en {len(pacientes_db)} pacientes."
         
-        # CIUDAD MÁS COMÚN
-        elif 'ciudad' in mensaje_lower and ('común' in mensaje_lower or 'comun' in mensaje_lower or 'más' in mensaje_lower or 'mas' in mensaje_lower):
+        elif 'ciudad' in mensaje_lower and ('común' in mensaje_lower or 'comun' in mensaje_lower):
             ciudades = {}
             for p in pacientes_db:
                 ciudades[p['ciudad']] = ciudades.get(p['ciudad'], 0) + 1
-            if ciudades:
-                ciudad_comun = max(ciudades.items(), key=lambda x: x[1])
-                respuesta = f"📍 La ciudad con más pacientes es: {ciudad_comun[0]}\n\n✅ Total: {ciudad_comun[1]} pacientes ({round(ciudad_comun[1]/len(pacientes_db)*100, 1)}%)\n\nDesglose por ciudades:\n"
-                for ciudad, cant in sorted(ciudades.items(), key=lambda x: x[1], reverse=True):
-                    respuesta += f"• {ciudad}: {cant} pacientes\n"
+            ciudad_top = max(ciudades.items(), key=lambda x: x[1])
+            respuesta = f"📍 Ciudad con más pacientes: {ciudad_top[0]}\n\n✅ Total: {ciudad_top[1]} pacientes\n\nDesglose:\n"
+            for c, cant in sorted(ciudades.items(), key=lambda x: x[1], reverse=True):
+                respuesta += f"• {c}: {cant}\n"
         
-        # DOCTOR MÁS OCUPADO
-        elif 'doctor' in mensaje_lower and ('ocupado' in mensaje_lower or 'solicitado' in mensaje_lower or 'más' in mensaje_lower or 'mas' in mensaje_lower):
-            doctores_count = {}
-            for p in pacientes_db:
-                doctores_count[p['doctor']] = doctores_count.get(p['doctor'], 0) + 1
-            if doctores_count:
-                doctor_ocupado = max(doctores_count.items(), key=lambda x: x[1])
-                respuesta = f"⭐ El doctor más solicitado es: {doctor_ocupado[0]}\n\n✅ Pacientes asignados: {doctor_ocupado[1]}\n\nRanking de doctores:\n"
-                for doctor, cant in sorted(doctores_count.items(), key=lambda x: x[1], reverse=True):
-                    respuesta += f"• {doctor}: {cant} pacientes\n"
+        elif 'gracias' in mensaje_lower:
+            respuesta = '¡De nada! 😊 Estoy aquí para ayudarte.'
         
-        # CUÁNTOS/CUÁNTAS
-        elif mensaje_lower.startswith('cuantos') or mensaje_lower.startswith('cuántos') or mensaje_lower.startswith('cuantas') or mensaje_lower.startswith('cuántas'):
-            if 'paciente' in mensaje_lower:
-                respuesta = f"👥 Actualmente hay {len(pacientes_db)} pacientes registrados en el sistema."
-            elif 'cita' in mensaje_lower:
-                respuesta = f"📅 Hay {len(citas_db)} citas programadas en total.\n\n🟢 Programadas: {len([c for c in citas_db if c['estado'] == 'Programada'])}\n✅ Completadas: {len([c for c in citas_db if c['estado'] == 'Completada'])}"
-            elif 'doctor' in mensaje_lower or 'médico' in mensaje_lower:
-                respuesta = f"👨‍⚕️ Tenemos {len(doctores_db)} doctores en nuestro equipo médico."
-            else:
-                respuesta = "❌ No entendí tu pregunta.\n\n💡 Intenta preguntar: ¿Cuántos pacientes hay?"
-        
-        # GRACIAS
-        elif 'gracias' in mensaje_lower or 'thank' in mensaje_lower:
-            respuesta = '¡De nada! 😊 Estoy aquí para ayudarte en lo que necesites.\n\n¿Hay algo más en lo que pueda asistirte?'
-        
-        # DESPEDIDA
-        elif any(palabra in mensaje_lower for palabra in ['adios', 'adiós', 'chao', 'hasta luego', 'bye']):
-            respuesta = '¡Hasta pronto! 👋 Que tengas un excelente día.\n\nRecuerda que estoy disponible 24/7 para ayudarte.'
-        
-        # MENSAJE NO RECONOCIDO
         else:
-            respuesta = f'Recibí tu mensaje: "{mensaje}"\n\n❓ No estoy seguro de cómo ayudarte con eso.\n\n💡 Escribe "ayuda" para ver todos los comandos disponibles o intenta hacer una pregunta más específica.'
-        
+            respuesta = f'Recibí: "{mensaje}"\n\n❓ No entendí. Escribe "ayuda" para ver comandos disponibles.'
+    
     except Exception as e:
-        respuesta = f"❌ Ocurrió un error al procesar tu solicitud: {str(e)}\n\n💡 Por favor intenta de nuevo o escribe 'ayuda' para ver los comandos disponibles."
+        respuesta = f"❌ Error: {str(e)}\n\n💡 Intenta de nuevo o escribe 'ayuda'."
         print(f"Error en chatbot: {e}")
     
     emit('mensaje_servidor', {'texto': respuesta, 'tipo': 'respuesta'})
 
-# ========================================
-# INICIAR APLICACIÓN
-# ========================================
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print(f'\n🏥 Clínica Isaac - Sistema iniciado en puerto {port}')
-    print(f'🌐 Accede a: http://localhost:{port}\n')
-    socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True)
+    print(f'\n🏥 Clínica Isaac - Iniciado en puerto {port}')
+    socketio.run(app, host='0.0.0.0', port=port, debug=True)
