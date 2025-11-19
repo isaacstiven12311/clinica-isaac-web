@@ -81,7 +81,6 @@ def agregar_paciente():
         pacientes_db.append(nuevo_paciente)
         next_id_paciente += 1
         
-        # Actualizar estadísticas en tiempo real
         socketio.emit('actualizar_datos', broadcast=True)
         
         return jsonify({'mensaje': 'Paciente agregado', 'paciente': nuevo_paciente}), 201
@@ -207,7 +206,7 @@ def handle_mensaje(data):
     
     try:
         # SALUDOS
-        if any(x in mensaje_lower for x in ['hola', 'hi', 'hello', 'buenos dias', 'buenas tardes', 'buenas noches', 'hey']):
+        if any(x in mensaje_lower for x in ['hola', 'hi', 'hello', 'buenos días', 'buenas tardes', 'buenas noches', 'hey']):
             respuesta = """¡Hola! 👋 Soy el asistente virtual de Clínica Isaac.
 
 ¿En qué puedo ayudarte hoy?
@@ -344,7 +343,6 @@ También entiendo preguntas naturales como:
             activos = len([p for p in pacientes_db if p['estado'] == 'Activo'])
             en_consulta = len([p for p in pacientes_db if p['estado'] == 'En consulta'])
             
-            # Ciudad más común
             ciudades = {}
             for p in pacientes_db:
                 ciudades[p['ciudad']] = ciudades.get(p['ciudad'], 0) + 1
