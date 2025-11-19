@@ -161,6 +161,43 @@
         .header-actions {
             display: flex;
             gap: 15px;
+            align-items: center;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+
+        .connection-status.connected {
+            border-color: var(--success);
+        }
+
+        .connection-status.disconnected {
+            border-color: var(--danger);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.connected {
+            background: var(--success);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .btn-icon {
@@ -731,6 +768,10 @@
                 <p style="color: var(--text-secondary); margin-top: 5px;" id="page-subtitle">Análisis de Atenciones Médicas 2025</p>
             </div>
             <div class="header-actions">
+                <div class="connection-status" id="connection-status">
+                    <div class="status-indicator" id="status-indicator"></div>
+                    <span id="status-text">Conectando...</span>
+                </div>
                 <div class="btn-icon" title="Notificaciones">
                     <i class="fas fa-bell"></i>
                 </div>
@@ -1025,28 +1066,53 @@
         let socket;
         let lineChart, pieChart;
         
+        // Obtener URL del servidor dinámicamente
+        const getServerUrl = () => {
+            // En producción, usar la URL actual del sitio
+            // En desarrollo local, usar localhost:5000
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://localhost:5000';
+            }
+            // En producción (Railway), usar el mismo dominio
+            return window.location.origin;
+        };
+        
         // ============================================
         // SOCKET IO EVENTS
         // ============================================
         function initSocket() {
-            socket = io({
+            const serverUrl = getServerUrl();
+            console.log('🌐 Conectando a:', serverUrl);
+            
+            socket = io(serverUrl, {
                 transports: ['websocket', 'polling'],
                 reconnection: true,
                 reconnectionDelay: 1000,
-                reconnectionAttempts: 5
+                reconnectionAttempts: 10,
+                timeout: 10000,
+                upgrade: true
             });
 
             socket.on('connect', () => {
-                console.log('✅ Conectado al servidor WebSocket');
-                mostrarNotificacion('🟢 Conectado al servidor');
+                console.log('✅ Conectado al servidor WebSocket - ID:', socket.id);
+                updateConnectionStatus(true);
+                mostrarNotificacion('✅ Conectado al servidor correctamente');
             });
 
-            socket.on('disconnect', () => {
-                console.log('🔴 Desconectado del servidor');
+            socket.on('connect_error', (error) => {
+                console.error('❌ Error de conexión:', error);
+                updateConnectionStatus(false);
+                mostrarNotificacion('❌ Error al conectar con el servidor', 'error');
+            });
+
+            socket.on('disconnect', (reason) => {
+                console.log('🔴 Desconectado del servidor. Razón:', reason);
+                updateConnectionStatus(false);
                 mostrarNotificacion('🔴 Desconectado del servidor', 'error');
             });
 
             socket.on('usuarios_conectados', (data) => {
+                console.log('👥 Usuarios conectados:', data.total);
                 document.getElementById('usuarios-online').textContent = data.total;
             });
 
@@ -1063,6 +1129,24 @@
                 if (tabActiva === 'tab-doctores') cargarDoctores();
                 if (tabActiva === 'tab-dashboard') cargarDashboard();
             });
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusDiv = document.getElementById('connection-status');
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            if (connected) {
+                statusDiv.classList.add('connected');
+                statusDiv.classList.remove('disconnected');
+                statusIndicator.classList.add('connected');
+                statusText.textContent = 'Conectado';
+            } else {
+                statusDiv.classList.remove('connected');
+                statusDiv.classList.add('disconnected');
+                statusIndicator.classList.remove('connected');
+                statusText.textContent = 'Desconectado';
+            }
         }
 
         // ============================================
@@ -1217,6 +1301,7 @@
                 document.getElementById('total-pacientes-stat').textContent = stats.total_pacientes;
                 document.getElementById('total-citas-stat').textContent = stats.total_citas;
                 document.getElementById('total-doctores-stat').textContent = stats.total_doctores;
+                document.getElementById('usuarios-online').textContent = stats.usuarios_conectados;
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -1570,6 +1655,7 @@
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Iniciando aplicación...');
+            console.log('🌐 Servidor URL:', getServerUrl());
             
             // Inicializar WebSocket
             initSocket();

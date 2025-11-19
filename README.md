@@ -9,4 +9,4 @@ Sistema de gestión de pacientes con chat en tiempo real.
 - ✅ Estadísticas en vivo
 
 ## Creado por
-Isaac Núñez - 2024
+Isaac Núñez - 2025

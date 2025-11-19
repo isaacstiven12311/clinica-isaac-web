@@ -6,9 +6,21 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'clinica-isaac-secret-2025'
-CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'clinica-isaac-secret-2025')
+
+# Configuración de CORS mejorada
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Configuración de SocketIO para producción
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode='threading',
+    logger=True,
+    engineio_logger=True,
+    ping_timeout=60,
+    ping_interval=25
+)
 
 # ========================================
 # BASE DE DATOS EN MEMORIA - DATOS 2025
@@ -84,7 +96,7 @@ def agregar_paciente():
         pacientes_db.append(nuevo_paciente)
         next_id_paciente += 1
         
-        socketio.emit('actualizar_datos', broadcast=True)
+        socketio.emit('actualizar_datos', {}, broadcast=True, namespace='/')
         
         return jsonify({'mensaje': 'Paciente agregado', 'paciente': nuevo_paciente}), 201
     except Exception as e:
@@ -96,7 +108,7 @@ def eliminar_paciente(id):
     paciente = next((p for p in pacientes_db if p['id'] == id), None)
     if paciente:
         pacientes_db = [p for p in pacientes_db if p['id'] != id]
-        socketio.emit('actualizar_datos', broadcast=True)
+        socketio.emit('actualizar_datos', {}, broadcast=True, namespace='/')
         return jsonify({'mensaje': 'Paciente eliminado'})
     return jsonify({'error': 'Paciente no encontrado'}), 404
 
@@ -127,7 +139,7 @@ def registrar_cita():
         citas_db.append(nueva_cita)
         next_id_cita += 1
         
-        socketio.emit('actualizar_datos', broadcast=True)
+        socketio.emit('actualizar_datos', {}, broadcast=True, namespace='/')
         return jsonify({'mensaje': 'Cita registrada', 'cita': nueva_cita}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -194,14 +206,14 @@ Soy tu asistente virtual inteligente. Puedo ayudarte con:
 Escribe "ayuda" para ver todos los comandos disponibles o pregúntame lo que necesites en lenguaje natural."""
     
     emit('mensaje_servidor', {'texto': mensaje_bienvenida, 'tipo': 'bienvenida'})
-    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
+    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True, namespace='/')
 
 @socketio.on('disconnect')
 def handle_disconnect():
     global usuarios_conectados
     usuarios_conectados = max(0, usuarios_conectados - 1)
     print(f'🔴 Cliente desconectado. Total: {usuarios_conectados}')
-    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
+    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True, namespace='/')
 
 @socketio.on('mensaje_cliente')
 def handle_mensaje(data):
@@ -457,4 +469,5 @@ if __name__ == '__main__':
     print(f'👨‍⚕️ Doctores disponibles: {len(doctores_db)}')
     print(f'{"="*50}\n')
     
+    # Para desarrollo local
     socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)

@@ -8,3 +8,4 @@ eventlet==0.35.2
 gevent==24.2.1
 gevent-websocket==0.10.1
 setuptools==69.0.0
+Werkzeug==3.0.1
