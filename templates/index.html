@@ -728,7 +728,7 @@
         <div class="header">
             <div>
                 <h1 id="page-title">Dashboard</h1>
-                <p style="color: var(--text-secondary); margin-top: 5px;">Análisis de Atenciones Médicas 2025</p>
+                <p style="color: var(--text-secondary); margin-top: 5px;" id="page-subtitle">Análisis de Atenciones Médicas 2025</p>
             </div>
             <div class="header-actions">
                 <div class="btn-icon" title="Notificaciones">
@@ -740,13 +740,13 @@
             </div>
         </div>
 
-        <!-- STATS CARDS -->
-        <div class="stats-grid">
+        <!-- STATS CARDS (Solo en Dashboard) -->
+        <div class="stats-grid" id="stats-cards">
             <div class="stat-card">
                 <div class="stat-header">
                     <div>
-                        <div class="stat-value" id="total-atendimientos">818</div>
-                        <div class="stat-label">Atenciones Totales</div>
+                        <div class="stat-value" id="total-pacientes-stat">10</div>
+                        <div class="stat-label">Pacientes Registrados</div>
                         <div class="stat-change">
                             <i class="fas fa-arrow-up"></i>
                             <span>+12.5%</span>
@@ -761,15 +761,15 @@
             <div class="stat-card green">
                 <div class="stat-header">
                     <div>
-                        <div class="stat-value" id="total-consultas">488</div>
-                        <div class="stat-label">Consultas Médicas</div>
+                        <div class="stat-value" id="total-citas-stat">6</div>
+                        <div class="stat-label">Citas Programadas</div>
                         <div class="stat-change">
                             <i class="fas fa-arrow-up"></i>
                             <span>+8.2%</span>
                         </div>
                     </div>
                     <div class="stat-icon">
-                        <i class="fas fa-stethoscope"></i>
+                        <i class="fas fa-calendar-check"></i>
                     </div>
                 </div>
             </div>
@@ -777,15 +777,15 @@
             <div class="stat-card orange">
                 <div class="stat-header">
                     <div>
-                        <div class="stat-value" id="total-examenes">231</div>
-                        <div class="stat-label">Exámenes Realizados</div>
+                        <div class="stat-value" id="total-doctores-stat">4</div>
+                        <div class="stat-label">Doctores Activos</div>
                         <div class="stat-change">
                             <i class="fas fa-arrow-up"></i>
                             <span>+15.3%</span>
                         </div>
                     </div>
                     <div class="stat-icon">
-                        <i class="fas fa-vial"></i>
+                        <i class="fas fa-user-md"></i>
                     </div>
                 </div>
             </div>
@@ -813,7 +813,7 @@
             <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fas fa-chart-line"></i> Atenciones a lo largo del tiempo</h3>
+                        <h3><i class="fas fa-chart-line"></i> Atenciones mensuales 2025</h3>
                         <div class="chart-filter">
                             <button class="filter-btn active">2025</button>
                             <button class="filter-btn">2024</button>
@@ -833,7 +833,7 @@
             <!-- DOCTORS TABLE -->
             <div class="table-card">
                 <div class="chart-header">
-                    <h3><i class="fas fa-user-md"></i> Atenciones por médico</h3>
+                    <h3><i class="fas fa-user-md"></i> Rendimiento de doctores</h3>
                 </div>
                 <div id="doctors-stats-table"></div>
             </div>
@@ -849,6 +849,73 @@
 
         <!-- TAB PACIENTES -->
         <div id="tab-pacientes" class="tab-content hidden">
+            <div class="chart-card" style="margin-bottom: 25px;">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-user-plus"></i> Registrar Nuevo Paciente</h3>
+                <form id="form-paciente" onsubmit="agregarPaciente(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre Completo *</label>
+                            <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Edad *</label>
+                            <input type="number" id="edad" placeholder="Ej: 35" min="1" max="120" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ciudad *</label>
+                            <input type="text" id="ciudad" placeholder="Ej: Bogotá" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Consultorio *</label>
+                            <input type="text" id="consultorio" placeholder="Ej: Consultorio 101" required>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Doctor Asignado</label>
+                            <select id="doctor">
+                                <option value="Por asignar">Por asignar</option>
+                                <option value="Dr. Juan Ramírez">Dr. Juan Ramírez</option>
+                                <option value="Dra. Laura López">Dra. Laura López</option>
+                                <option value="Dr. Carlos Martínez">Dr. Carlos Martínez</option>
+                                <option value="Dra. Ana Castro">Dra. Ana Castro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Motivo de Consulta *</label>
+                            <input type="text" id="causa" placeholder="Ej: Dolor de cabeza" required>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Agregar Paciente
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="cargarPacientes()">
+                            <i class="fas fa-sync"></i> Actualizar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <h3><i class="fas fa-list"></i> Lista de Pacientes</h3>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar paciente..." id="search-paciente" onkeyup="filtrarTabla('lista-pacientes', this.value)">
+                    </div>
+                </div>
+                <div id="lista-pacientes">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Cargando pacientes...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CITAS -->
+        <div id="tab-citas" class="tab-content hidden">
             <div class="chart-card" style="margin-bottom: 25px;">
                 <h3 style="margin-bottom: 20px;"><i class="fas fa-calendar-plus"></i> Programar Nueva Cita</h3>
                 <form id="form-cita" onsubmit="registrarCita(event)">
@@ -955,30 +1022,48 @@
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-        const socket = io();
+        let socket;
         let lineChart, pieChart;
         
         // ============================================
         // SOCKET IO EVENTS
         // ============================================
-        socket.on('connect', () => {
-            console.log('✅ Conectado al servidor');
-        });
+        function initSocket() {
+            socket = io({
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: 5
+            });
 
-        socket.on('usuarios_conectados', (data) => {
-            document.getElementById('usuarios-online').textContent = data.total;
-        });
+            socket.on('connect', () => {
+                console.log('✅ Conectado al servidor WebSocket');
+                mostrarNotificacion('🟢 Conectado al servidor');
+            });
 
-        socket.on('mensaje_servidor', (data) => {
-            agregarMensajeChat('servidor', data.texto);
-        });
+            socket.on('disconnect', () => {
+                console.log('🔴 Desconectado del servidor');
+                mostrarNotificacion('🔴 Desconectado del servidor', 'error');
+            });
 
-        socket.on('actualizar_datos', () => {
-            cargarPacientes();
-            cargarCitas();
-            cargarEstadisticas();
-            cargarDashboard();
-        });
+            socket.on('usuarios_conectados', (data) => {
+                document.getElementById('usuarios-online').textContent = data.total;
+            });
+
+            socket.on('mensaje_servidor', (data) => {
+                console.log('📩 Mensaje del servidor:', data);
+                agregarMensajeChat('servidor', data.texto);
+            });
+
+            socket.on('actualizar_datos', () => {
+                cargarEstadisticas();
+                const tabActiva = document.querySelector('.tab-content:not(.hidden)').id;
+                if (tabActiva === 'tab-pacientes') cargarPacientes();
+                if (tabActiva === 'tab-citas') cargarCitas();
+                if (tabActiva === 'tab-doctores') cargarDoctores();
+                if (tabActiva === 'tab-dashboard') cargarDashboard();
+            });
+        }
 
         // ============================================
         // NAVIGATION
@@ -990,15 +1075,24 @@
             });
             event.target.closest('.nav-link').classList.add('active');
 
-            // Update page title
+            // Update page title and subtitle
             const titles = {
-                'dashboard': 'Dashboard',
-                'pacientes': 'Gestión de Pacientes',
-                'citas': 'Gestión de Citas',
-                'doctores': 'Equipo Médico',
-                'chat': 'Asistente Virtual'
+                'dashboard': ['Dashboard', 'Análisis de Atenciones Médicas 2025'],
+                'pacientes': ['Gestión de Pacientes', 'Administración de pacientes del sistema'],
+                'citas': ['Gestión de Citas', 'Programación y seguimiento de citas médicas'],
+                'doctores': ['Equipo Médico', 'Personal médico de Clínica Isaac'],
+                'chat': ['Asistente Virtual', 'Chatbot inteligente 24/7']
             };
-            document.getElementById('page-title').textContent = titles[tab];
+            document.getElementById('page-title').textContent = titles[tab][0];
+            document.getElementById('page-subtitle').textContent = titles[tab][1];
+
+            // Show/hide stats cards (only in dashboard)
+            const statsCards = document.getElementById('stats-cards');
+            if (tab === 'dashboard') {
+                statsCards.style.display = 'grid';
+            } else {
+                statsCards.style.display = 'none';
+            }
 
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(content => {
@@ -1072,17 +1166,19 @@
             });
         }
 
-        function crearGraficoPie() {
+        function crearGraficoPie(consultas, examenes) {
             const ctx = document.getElementById('pieChart').getContext('2d');
             
             if (pieChart) pieChart.destroy();
+            
+            const controles = Math.floor((consultas + examenes) * 0.15);
             
             pieChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Consultas', 'Exámenes', 'Controles'],
                     datasets: [{
-                        data: [488, 231, 99],
+                        data: [consultas, examenes, controles],
                         backgroundColor: [
                             '#00d9ff',
                             '#00ff88',
@@ -1118,9 +1214,9 @@
                 const response = await fetch('/api/estadisticas');
                 const stats = await response.json();
                 
-                document.getElementById('total-atendimientos').textContent = stats.total_pacientes * 10;
-                document.getElementById('total-consultas').textContent = stats.total_citas * 50;
-                document.getElementById('total-examenes').textContent = Math.floor(stats.total_pacientes * 3.5);
+                document.getElementById('total-pacientes-stat').textContent = stats.total_pacientes;
+                document.getElementById('total-citas-stat').textContent = stats.total_citas;
+                document.getElementById('total-doctores-stat').textContent = stats.total_doctores;
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -1135,23 +1231,24 @@
                 crearGraficoLinea(stats.meses, stats.atendimientos_mensuales);
                 
                 // Crear gráfico de pie
-                crearGraficoPie();
+                const totalConsultas = stats.consultas_mensuales.reduce((a, b) => a + b, 0);
+                const totalExamenes = stats.examenes_mensuales.reduce((a, b) => a + b, 0);
+                crearGraficoPie(totalConsultas, totalExamenes);
                 
                 // Tabla de doctores
                 const doctorsTable = document.getElementById('doctors-stats-table');
-                let tableHTML = '<table><thead><tr><th>Médico</th><th>Consultas</th><th>Exámenes</th><th>Controles</th></tr></thead><tbody>';
+                let tableHTML = '<table><thead><tr><th>Médico</th><th>Especialidad</th><th>Pacientes</th><th>Rendimiento</th></tr></thead><tbody>';
                 
                 stats.top_doctores.forEach(d => {
-                    const consultas = Math.floor(d.pacientes_atendidos * 0.6);
-                    const examenes = Math.floor(d.pacientes_atendidos * 0.25);
-                    const controles = Math.floor(d.pacientes_atendidos * 0.15);
+                    const rendimiento = d.pacientes_atendidos > 200 ? 'Excelente' : d.pacientes_atendidos > 150 ? 'Bueno' : 'Regular';
+                    const badgeClass = d.pacientes_atendidos > 200 ? 'badge-success' : d.pacientes_atendidos > 150 ? 'badge-info' : 'badge-warning';
                     
                     tableHTML += `
                         <tr>
                             <td><i class="fas fa-user-md"></i> ${d.nombre}</td>
-                            <td><span class="badge badge-success">${consultas}</span></td>
-                            <td><span class="badge badge-info">${examenes}</span></td>
-                            <td><span class="badge badge-warning">${controles}</span></td>
+                            <td>${d.especialidad}</td>
+                            <td><strong style="color: var(--primary);">${d.pacientes_atendidos}</strong></td>
+                            <td><span class="badge ${badgeClass}">${rendimiento}</span></td>
                         </tr>
                     `;
                 });
@@ -1396,11 +1493,21 @@
             const input = document.getElementById('mensaje-input');
             const mensaje = input.value.trim();
             
-            if (!mensaje) return;
+            if (!mensaje) {
+                mostrarNotificacion('⚠️ Escribe un mensaje primero', 'error');
+                return;
+            }
 
+            console.log('📤 Enviando mensaje:', mensaje);
             agregarMensajeChat('cliente', mensaje);
-            socket.emit('mensaje_cliente', { mensaje: mensaje });
-            input.value = '';
+            
+            if (socket && socket.connected) {
+                socket.emit('mensaje_cliente', { mensaje: mensaje });
+                input.value = '';
+            } else {
+                mostrarNotificacion('❌ No conectado al servidor', 'error');
+                agregarMensajeChat('servidor', '❌ Error: No estoy conectado al servidor. Intenta recargar la página.');
+            }
         }
 
         function enviarSugerencia(mensaje) {
@@ -1462,88 +1569,26 @@
         // INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Iniciando aplicación...');
+            
+            // Inicializar WebSocket
+            initSocket();
+            
+            // Cargar datos iniciales
             cargarEstadisticas();
             cargarDashboard();
-            cargarPacientes();
-            cargarCitas();
-            cargarDoctores();
             
             // Establecer fecha mínima para citas (hoy)
             const hoy = new Date().toISOString().split('T')[0];
             document.getElementById('cita-fecha').setAttribute('min', hoy);
+            
+            console.log('✅ Aplicación iniciada correctamente');
         });
 
-        // Actualizar datos cada 30 segundos
+        // Actualizar estadísticas cada 30 segundos
         setInterval(() => {
             cargarEstadisticas();
         }, 30000);
     </script>
 </body>
-</html> style="margin-bottom: 20px;"><i class="fas fa-user-plus"></i> Registrar Nuevo Paciente</h3>
-                <form id="form-paciente" onsubmit="agregarPaciente(event)">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nombre Completo *</label>
-                            <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Edad *</label>
-                            <input type="number" id="edad" placeholder="Ej: 35" min="1" max="120" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Ciudad *</label>
-                            <input type="text" id="ciudad" placeholder="Ej: Bogotá" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Consultorio *</label>
-                            <input type="text" id="consultorio" placeholder="Ej: Consultorio 101" required>
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Doctor Asignado</label>
-                            <select id="doctor">
-                                <option value="Por asignar">Por asignar</option>
-                                <option value="Dr. Juan Ramírez">Dr. Juan Ramírez</option>
-                                <option value="Dra. Laura López">Dra. Laura López</option>
-                                <option value="Dr. Carlos Martínez">Dr. Carlos Martínez</option>
-                                <option value="Dra. Ana Castro">Dra. Ana Castro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Motivo de Consulta *</label>
-                            <input type="text" id="causa" placeholder="Ej: Dolor de cabeza" required>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-plus"></i> Agregar Paciente
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="cargarPacientes()">
-                            <i class="fas fa-sync"></i> Actualizar
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="table-card">
-                <div class="table-header">
-                    <h3><i class="fas fa-list"></i> Lista de Pacientes</h3>
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar paciente..." id="search-paciente" onkeyup="filtrarTabla('lista-pacientes', this.value)">
-                    </div>
-                </div>
-                <div id="lista-pacientes">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        Cargando pacientes...
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB CITAS -->
-        <div id="tab-citas" class="tab-content hidden">
-            <div class="chart-card" style="margin-bottom: 25px;">
-                <h3
+</html>

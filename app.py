@@ -11,7 +11,7 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # ========================================
-# BASE DE DATOS EN MEMORIA - DATOS REALES 2025
+# BASE DE DATOS EN MEMORIA - DATOS 2025
 # ========================================
 
 pacientes_db = [
@@ -28,12 +28,12 @@ pacientes_db = [
 ]
 
 citas_db = [
-    {'id': 1, 'id_paciente': 1, 'paciente': 'Carlos Andrés Pérez Gómez', 'doctor': 'Dr. Juan Ramírez', 'fecha': '2025-05-20', 'hora': '09:00', 'motivo': 'Control mensual de presión arterial', 'estado': 'Programada'},
-    {'id': 2, 'id_paciente': 2, 'paciente': 'Ana María Rodríguez López', 'doctor': 'Dra. Laura López', 'fecha': '2025-05-21', 'hora': '10:30', 'motivo': 'Valoración neurológica', 'estado': 'Programada'},
-    {'id': 3, 'id_paciente': 3, 'paciente': 'Luis Fernando Torres Silva', 'doctor': 'Dr. Carlos Martínez', 'fecha': '2025-05-22', 'hora': '14:00', 'motivo': 'Electrocardiograma de control', 'estado': 'Programada'},
-    {'id': 4, 'id_paciente': 4, 'paciente': 'María Elena Suárez Castro', 'doctor': 'Dr. Juan Ramírez', 'fecha': '2025-04-15', 'hora': '11:00', 'motivo': 'Resultados de glucosa en sangre', 'estado': 'Completada'},
-    {'id': 5, 'id_paciente': 5, 'paciente': 'Pedro José Ramírez Ortiz', 'doctor': 'Dra. Ana Castro', 'fecha': '2025-05-19', 'hora': '15:30', 'motivo': 'Seguimiento post-tratamiento', 'estado': 'Programada'},
-    {'id': 6, 'id_paciente': 6, 'paciente': 'Laura Cristina Mendoza Vargas', 'doctor': 'Dr. Carlos Martínez', 'fecha': '2025-05-23', 'hora': '09:30', 'motivo': 'Holter de 24 horas', 'estado': 'Programada'},
+    {'id': 1, 'id_paciente': 1, 'paciente': 'Carlos Andrés Pérez Gómez', 'doctor': 'Dr. Juan Ramírez', 'fecha': '2025-11-25', 'hora': '09:00', 'motivo': 'Control mensual de presión arterial', 'estado': 'Programada'},
+    {'id': 2, 'id_paciente': 2, 'paciente': 'Ana María Rodríguez López', 'doctor': 'Dra. Laura López', 'fecha': '2025-11-26', 'hora': '10:30', 'motivo': 'Valoración neurológica', 'estado': 'Programada'},
+    {'id': 3, 'id_paciente': 3, 'paciente': 'Luis Fernando Torres Silva', 'doctor': 'Dr. Carlos Martínez', 'fecha': '2025-11-27', 'hora': '14:00', 'motivo': 'Electrocardiograma de control', 'estado': 'Programada'},
+    {'id': 4, 'id_paciente': 4, 'paciente': 'María Elena Suárez Castro', 'doctor': 'Dr. Juan Ramírez', 'fecha': '2025-10-15', 'hora': '11:00', 'motivo': 'Resultados de glucosa en sangre', 'estado': 'Completada'},
+    {'id': 5, 'id_paciente': 5, 'paciente': 'Pedro José Ramírez Ortiz', 'doctor': 'Dra. Ana Castro', 'fecha': '2025-11-22', 'hora': '15:30', 'motivo': 'Seguimiento post-tratamiento', 'estado': 'Programada'},
+    {'id': 6, 'id_paciente': 6, 'paciente': 'Laura Cristina Mendoza Vargas', 'doctor': 'Dr. Carlos Martínez', 'fecha': '2025-11-28', 'hora': '09:30', 'motivo': 'Holter de 24 horas', 'estado': 'Programada'},
 ]
 
 doctores_db = [
@@ -43,8 +43,11 @@ doctores_db = [
     {'id': 4, 'nombre': 'Dra. Ana Castro', 'especialidad': 'Medicina Interna', 'consultorio': 'Consultorio 404', 'pacientes_atendidos': 134, 'disponible': True},
 ]
 
+# Datos para gráficos (2025)
 meses_labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-atendimientos_mensuales = [52, 58, 64, 71, 0, 0, 0, 0, 0, 0, 0, 0]
+atendimientos_mensuales_2025 = [52, 58, 64, 71, 85, 92, 0, 0, 0, 0, 0, 0]
+consultas_mensuales_2025 = [32, 35, 40, 45, 52, 58, 0, 0, 0, 0, 0, 0]
+examenes_mensuales_2025 = [15, 18, 19, 21, 25, 28, 0, 0, 0, 0, 0, 0]
 
 next_id_paciente = 11
 next_id_cita = 7
@@ -163,11 +166,13 @@ def estadisticas():
         'top_doctores': top_doctores,
         'especialidades': especialidades,
         'meses': meses_labels,
-        'atendimientos_mensuales': atendimientos_mensuales,
+        'atendimientos_mensuales': atendimientos_mensuales_2025,
+        'consultas_mensuales': consultas_mensuales_2025,
+        'examenes_mensuales': examenes_mensuales_2025,
     })
 
 # ========================================
-# WEBSOCKETS - CHATBOT PROFESIONAL
+# WEBSOCKETS - CHATBOT FUNCIONAL
 # ========================================
 
 @socketio.on('connect')
@@ -203,6 +208,8 @@ def handle_mensaje(data):
     mensaje = data['mensaje'].strip()
     mensaje_lower = mensaje.lower()
     respuesta = ""
+    
+    print(f"📩 Mensaje recibido: {mensaje}")
     
     try:
         # SALUDOS
@@ -369,36 +376,6 @@ También entiendo preguntas naturales como:
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 💡 Sistema operativo al 100%"""
         
-        # EDAD PROMEDIO
-        elif 'edad promedio' in mensaje_lower or 'edad media' in mensaje_lower:
-            edad_prom = sum(p['edad'] for p in pacientes_db) / len(pacientes_db)
-            respuesta = f"""🎂 EDAD PROMEDIO:
-
-📊 {round(edad_prom, 1)} años
-
-Basado en {len(pacientes_db)} pacientes registrados en el sistema."""
-        
-        # CIUDAD MÁS COMÚN
-        elif 'ciudad' in mensaje_lower and ('común' in mensaje_lower or 'comun' in mensaje_lower or 'más' in mensaje_lower):
-            ciudades = {}
-            for p in pacientes_db:
-                ciudades[p['ciudad']] = ciudades.get(p['ciudad'], 0) + 1
-            
-            ciudad_top = max(ciudades.items(), key=lambda x: x[1])
-            porcentaje = (ciudad_top[1] / len(pacientes_db)) * 100
-            
-            respuesta = f"""📍 CIUDAD CON MÁS PACIENTES:
-
-🏆 {ciudad_top[0]}
-📊 {ciudad_top[1]} pacientes ({round(porcentaje, 1)}%)
-
-DESGLOSE POR CIUDADES:
-"""
-            for ciudad, cant in sorted(ciudades.items(), key=lambda x: x[1], reverse=True):
-                porc = (cant / len(pacientes_db)) * 100
-                barra = "█" * int(porc / 5)
-                respuesta += f"\n📍 {ciudad}: {cant} ({round(porc, 1)}%)\n   {barra}"
-        
         # CUÁNTOS/CUÁNTAS
         elif any(x in mensaje_lower for x in ['cuantos', 'cuántos', 'cuantas', 'cuántas']):
             if 'paciente' in mensaje_lower:
@@ -462,6 +439,7 @@ Estoy aquí para ayudarte 😊"""
 Error técnico: {str(e)}"""
         print(f"❌ Error en chatbot: {e}")
     
+    print(f"📤 Enviando respuesta: {respuesta[:100]}...")
     emit('mensaje_servidor', {'texto': respuesta, 'tipo': 'respuesta'})
 
 # ========================================
