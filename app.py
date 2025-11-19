@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'clinica-isaac-secret-2025')
 
-# Configuración de CORS mejorada
+# CORS configurado correctamente
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Configuración de SocketIO para producción
+# SocketIO configurado para Railway
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
-    async_mode='threading',
-    logger=True,
-    engineio_logger=True,
+    async_mode='eventlet',
+    logger=False,
+    engineio_logger=False,
     ping_timeout=60,
-    ping_interval=25
+    ping_interval=25,
+    transports=['websocket', 'polling']
 )
 
 # ========================================
-# BASE DE DATOS EN MEMORIA - DATOS 2025
+# BASE DE DATOS EN MEMORIA
 # ========================================
 
 pacientes_db = [
@@ -55,7 +56,6 @@ doctores_db = [
     {'id': 4, 'nombre': 'Dra. Ana Castro', 'especialidad': 'Medicina Interna', 'consultorio': 'Consultorio 404', 'pacientes_atendidos': 134, 'disponible': True},
 ]
 
-# Datos para gráficos (2025)
 meses_labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 atendimientos_mensuales_2025 = [52, 58, 64, 71, 85, 92, 0, 0, 0, 0, 0, 0]
 consultas_mensuales_2025 = [32, 35, 40, 45, 52, 58, 0, 0, 0, 0, 0, 0]
@@ -71,7 +71,7 @@ usuarios_conectados = 0
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory('templates', 'index.html')
 
 @app.route('/api/pacientes', methods=['GET'])
 def listar_pacientes():
@@ -96,7 +96,7 @@ def agregar_paciente():
         pacientes_db.append(nuevo_paciente)
         next_id_paciente += 1
         
-        socketio.emit('actualizar_datos', {}, broadcast=True, namespace='/')
+        socketio.emit('actualizar_datos', {}, broadcast=True)
         
         return jsonify({'mensaje': 'Paciente agregado', 'paciente': nuevo_paciente}), 201
     except Exception as e:
@@ -108,7 +108,7 @@ def eliminar_paciente(id):
     paciente = next((p for p in pacientes_db if p['id'] == id), None)
     if paciente:
         pacientes_db = [p for p in pacientes_db if p['id'] != id]
-        socketio.emit('actualizar_datos', {}, broadcast=True, namespace='/')
+        socketio.emit('actualizar_datos', {}, broadcast=True)
         return jsonify({'mensaje': 'Paciente eliminado'})
     return jsonify({'error': 'Paciente no encontrado'}), 404
 
@@ -139,7 +139,7 @@ def registrar_cita():
         citas_db.append(nueva_cita)
         next_id_cita += 1
         
-        socketio.emit('actualizar_datos', {}, broadcast=True, namespace='/')
+        socketio.emit('actualizar_datos', {}, broadcast=True)
         return jsonify({'mensaje': 'Cita registrada', 'cita': nueva_cita}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -184,7 +184,7 @@ def estadisticas():
     })
 
 # ========================================
-# WEBSOCKETS - CHATBOT FUNCIONAL
+# WEBSOCKETS - CHATBOT
 # ========================================
 
 @socketio.on('connect')
@@ -199,21 +199,21 @@ Soy tu asistente virtual inteligente. Puedo ayudarte con:
 
 - 👥 Consultar información de pacientes
 - 📅 Ver citas programadas
-- 👨‍⚕️ Información del equipo médico
+- 👨‍⚕ Información del equipo médico
 - 📊 Estadísticas del sistema
 - 🔍 Búsquedas específicas
 
 Escribe "ayuda" para ver todos los comandos disponibles o pregúntame lo que necesites en lenguaje natural."""
     
     emit('mensaje_servidor', {'texto': mensaje_bienvenida, 'tipo': 'bienvenida'})
-    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True, namespace='/')
+    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
 
 @socketio.on('disconnect')
 def handle_disconnect():
     global usuarios_conectados
     usuarios_conectados = max(0, usuarios_conectados - 1)
     print(f'🔴 Cliente desconectado. Total: {usuarios_conectados}')
-    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True, namespace='/')
+    socketio.emit('usuarios_conectados', {'total': usuarios_conectados}, broadcast=True)
 
 @socketio.on('mensaje_cliente')
 def handle_mensaje(data):
@@ -224,7 +224,6 @@ def handle_mensaje(data):
     print(f"📩 Mensaje recibido: {mensaje}")
     
     try:
-        # SALUDOS
         if any(x in mensaje_lower for x in ['hola', 'hi', 'hello', 'buenos días', 'buenas tardes', 'buenas noches', 'hey']):
             respuesta = """¡Hola! 👋 Soy el asistente virtual de Clínica Isaac.
 
@@ -238,7 +237,6 @@ def handle_mensaje(data):
 
 O escribe "ayuda" para ver todos los comandos."""
         
-        # AYUDA
         elif 'ayuda' in mensaje_lower or mensaje_lower in ['?', 'help']:
             respuesta = """📋 GUÍA DE COMANDOS:
 
@@ -251,8 +249,6 @@ O escribe "ayuda" para ver todos los comandos."""
 
 📊 ESTADÍSTICAS:
 - "estadísticas" - Resumen completo del sistema
-- "edad promedio" - Edad promedio de pacientes
-- "ciudad más común" - Ciudad con más registros
 - "cuántos pacientes" - Total de pacientes
 
 💬 LENGUAJE NATURAL:
@@ -263,7 +259,6 @@ También entiendo preguntas naturales como:
 
 ¡Pregúntame lo que necesites!"""
         
-        # LISTAR PACIENTES
         elif 'pacientes' in mensaje_lower or 'lista de pacientes' in mensaje_lower:
             total = len(pacientes_db)
             respuesta = f"👥 PACIENTES REGISTRADOS ({total} en total):\n\n"
@@ -272,7 +267,7 @@ También entiendo preguntas naturales como:
                 estado_emoji = "🟢" if p['estado'] == 'Activo' else "🔵"
                 respuesta += f"{estado_emoji} #{p['id']} - {p['nombre']}\n"
                 respuesta += f"   🎂 {p['edad']} años | 📍 {p['ciudad']}\n"
-                respuesta += f"   👨‍⚕️ {p['doctor']}\n"
+                respuesta += f"   👨‍⚕ {p['doctor']}\n"
                 respuesta += f"   📋 {p['causa']}\n\n"
             
             if total > 8:
@@ -280,7 +275,6 @@ También entiendo preguntas naturales como:
             
             respuesta += "💡 Para ver detalles de un paciente específico, escribe: 'paciente [ID]'"
         
-        # VER PACIENTE POR ID
         elif 'paciente' in mensaje_lower and any(c.isdigit() for c in mensaje):
             import re
             numeros = re.findall(r'\d+', mensaje)
@@ -296,14 +290,13 @@ También entiendo preguntas naturales como:
 🎂 Edad: {paciente['edad']} años
 📍 Ciudad: {paciente['ciudad']}
 🏥 Consultorio: {paciente['consultorio']}
-👨‍⚕️ Doctor: {paciente['doctor']}
+👨‍⚕ Doctor: {paciente['doctor']}
 📋 Motivo: {paciente['causa']}
 📅 Ingreso: {paciente['fecha_ingreso']}
 🏥 Estado: {paciente['estado']}"""
                 else:
                     respuesta = f"❌ No encontré un paciente con ID {id_buscar}.\n\n💡 Escribe 'pacientes' para ver todos los IDs disponibles."
         
-        # BUSCAR PACIENTE POR NOMBRE
         elif 'buscar' in mensaje_lower:
             nombre_buscar = mensaje_lower.replace('buscar', '').strip()
             if nombre_buscar:
@@ -320,7 +313,6 @@ También entiendo preguntas naturales como:
             else:
                 respuesta = "❌ Por favor especifica un nombre para buscar.\n\nEjemplo: buscar Carlos"
         
-        # LISTAR CITAS
         elif 'citas' in mensaje_lower or 'cita' in mensaje_lower:
             total_citas = len(citas_db)
             programadas = len([c for c in citas_db if c['estado'] == 'Programada'])
@@ -339,12 +331,11 @@ También entiendo preguntas naturales como:
                     respuesta += f"🟢 Cita #{c['id']}\n"
                     respuesta += f"   👤 {c['paciente']}\n"
                     respuesta += f"   📅 {c['fecha']} a las {c['hora']}\n"
-                    respuesta += f"   👨‍⚕️ {c['doctor']}\n"
+                    respuesta += f"   👨‍⚕ {c['doctor']}\n"
                     respuesta += f"   📋 {c['motivo']}\n\n"
         
-        # LISTAR DOCTORES
         elif 'doctores' in mensaje_lower or 'doctor' in mensaje_lower or 'médicos' in mensaje_lower:
-            respuesta = f"👨‍⚕️ EQUIPO MÉDICO DE CLÍNICA ISAAC:\n\n"
+            respuesta = f"👨‍⚕ EQUIPO MÉDICO DE CLÍNICA ISAAC:\n\n"
             
             for d in doctores_db:
                 disponible_emoji = "🟢" if d['disponible'] else "🔴"
@@ -356,7 +347,6 @@ También entiendo preguntas naturales como:
                 respuesta += f"   📊 Pacientes atendidos: {d['pacientes_atendidos']}\n"
                 respuesta += f"   Estado: {disponible_texto}\n\n"
         
-        # ESTADÍSTICAS
         elif 'estadísticas' in mensaje_lower or 'estadisticas' in mensaje_lower or 'resumen' in mensaje_lower:
             edad_prom = sum(p['edad'] for p in pacientes_db) / len(pacientes_db)
             activos = len([p for p in pacientes_db if p['estado'] == 'Activo'])
@@ -374,7 +364,7 @@ También entiendo preguntas naturales como:
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 👥 Total pacientes: {len(pacientes_db)}
 📅 Citas programadas: {len(citas_db)}
-👨‍⚕️ Doctores activos: {len(doctores_db)}
+👨‍⚕ Doctores activos: {len(doctores_db)}
 🌐 Usuarios en línea: {usuarios_conectados}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -388,7 +378,6 @@ También entiendo preguntas naturales como:
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 💡 Sistema operativo al 100%"""
         
-        # CUÁNTOS/CUÁNTAS
         elif any(x in mensaje_lower for x in ['cuantos', 'cuántos', 'cuantas', 'cuántas']):
             if 'paciente' in mensaje_lower:
                 respuesta = f"""👥 PACIENTES REGISTRADOS:
@@ -410,7 +399,7 @@ También entiendo preguntas naturales como:
             elif 'doctor' in mensaje_lower or 'médico' in mensaje_lower:
                 disponibles = len([d for d in doctores_db if d['disponible']])
                 
-                respuesta = f"""👨‍⚕️ EQUIPO MÉDICO:
+                respuesta = f"""👨‍⚕ EQUIPO MÉDICO:
 
 📊 Total: {len(doctores_db)} doctores
 🟢 Disponibles: {disponibles}
@@ -418,15 +407,12 @@ También entiendo preguntas naturales como:
             else:
                 respuesta = "❓ No entendí tu pregunta.\n\n💡 Intenta: ¿Cuántos pacientes hay?"
         
-        # GRACIAS
         elif 'gracias' in mensaje_lower or 'thank' in mensaje_lower:
             respuesta = "¡De nada! 😊 Es un placer ayudarte.\n\n¿Hay algo más en lo que pueda asistirte?"
         
-        # DESPEDIDA
         elif any(x in mensaje_lower for x in ['adios', 'adiós', 'chao', 'hasta luego', 'bye', 'nos vemos']):
             respuesta = "¡Hasta pronto! 👋 Que tengas un excelente día.\n\nRecuerda que estoy disponible 24/7 cuando me necesites."
         
-        # MENSAJE NO RECONOCIDO
         else:
             respuesta = f"""Recibí tu mensaje: "{mensaje}"
 
@@ -451,7 +437,7 @@ Estoy aquí para ayudarte 😊"""
 Error técnico: {str(e)}"""
         print(f"❌ Error en chatbot: {e}")
     
-    print(f"📤 Enviando respuesta: {respuesta[:100]}...")
+    print(f"📤 Enviando respuesta al cliente")
     emit('mensaje_servidor', {'texto': respuesta, 'tipo': 'respuesta'})
 
 # ========================================
@@ -463,11 +449,10 @@ if __name__ == '__main__':
     print(f'\n{"="*50}')
     print(f'🏥 CLÍNICA ISAAC - SISTEMA MÉDICO INTEGRAL')
     print(f'{"="*50}')
-    print(f'🌐 Servidor iniciado en: http://localhost:{port}')
+    print(f'🌐 Servidor iniciado en puerto: {port}')
     print(f'📊 Pacientes registrados: {len(pacientes_db)}')
     print(f'📅 Citas programadas: {len(citas_db)}')
-    print(f'👨‍⚕️ Doctores disponibles: {len(doctores_db)}')
+    print(f'👨‍⚕ Doctores disponibles: {len(doctores_db)}')
     print(f'{"="*50}\n')
     
-    # Para desarrollo local
-    socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=port, debug=False)
